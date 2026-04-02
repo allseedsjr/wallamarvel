@@ -1,16 +1,16 @@
 import XCTest
 @testable import WallaMarvel
 
-final class ListHeroesUISpy: ListHeroesUI {
-    private(set) var updatedHeroesCount: Int?
+final class ListCharactersUISpy: ListCharactersUI {
+    private(set) var updatedCharactersCount: Int?
     private let updateExpectation: XCTestExpectation?
 
     init(updateExpectation: XCTestExpectation? = nil) {
         self.updateExpectation = updateExpectation
     }
 
-    func update(heroes: [Character]) {
-        updatedHeroesCount = heroes.count
+    func update(characters: [Character]) {
+        updatedCharactersCount = characters.count
         updateExpectation?.fulfill()
     }
 }

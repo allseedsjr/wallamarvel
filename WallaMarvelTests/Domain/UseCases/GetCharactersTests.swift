@@ -1,23 +1,23 @@
 import XCTest
 @testable import WallaMarvel
 
-final class GetHeroesTests: XCTestCase {
-    private let repositorySpy = MarvelRepositorySpy()
-    private lazy var sut = GetHeroes(repository: repositorySpy)
+final class GetCharactersTests: XCTestCase {
+    private let repositorySpy = CharacterRepositorySpy()
+    private lazy var sut = GetCharacters(repository: repositorySpy)
 
     func test_whenExecute_called_shouldCallRepository() async throws {
         _ = try await sut.execute()
 
-        XCTAssertTrue(repositorySpy.getHeroesCalled)
+        XCTAssertTrue(repositorySpy.getCharactersCalled)
     }
 
     func test_whenExecute_succeeds_shouldReturnResultFromRepository() async throws {
-        let expectedHeroes = [Character.fixture()]
-        repositorySpy.result = expectedHeroes
+        let expectedCharacters = [Character.fixture()]
+        repositorySpy.result = expectedCharacters
 
         let result = try await sut.execute()
 
-        XCTAssertEqual(result.count, expectedHeroes.count)
+        XCTAssertEqual(result.count, expectedCharacters.count)
     }
 
     func test_whenExecute_fails_shouldThrowError() async {
@@ -27,7 +27,7 @@ final class GetHeroesTests: XCTestCase {
             _ = try await sut.execute()
             XCTFail("Expected error to be thrown")
         } catch {
-            XCTAssertTrue(repositorySpy.getHeroesCalled)
+            XCTAssertTrue(repositorySpy.getCharactersCalled)
         }
     }
 }

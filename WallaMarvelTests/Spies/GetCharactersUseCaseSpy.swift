@@ -1,6 +1,6 @@
 @testable import WallaMarvel
 
-final class GetHeroesUseCaseSpy: GetHeroesUseCaseProtocol {
+final class GetCharactersUseCaseSpy: GetCharactersUseCaseProtocol {
     private(set) var executeCalled: Bool = false
     var result: [Character] = []
     var error: Error?
