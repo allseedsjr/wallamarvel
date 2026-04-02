@@ -7,7 +7,7 @@ protocol ListHeroesPresenterProtocol: AnyObject {
 }
 
 protocol ListHeroesUI: AnyObject {
-    func update(heroes: [CharacterDataModel])
+    func update(heroes: [Character])
 }
 
 final class ListHeroesPresenter: ListHeroesPresenterProtocol {
@@ -26,9 +26,9 @@ final class ListHeroesPresenter: ListHeroesPresenterProtocol {
     
     func getHeroes() async {
         do {
-            let characterDataContainer = try await getHeroesUseCase.execute()
+            let heroes = try await getHeroesUseCase.execute()
             await MainActor.run {
-                self.ui?.update(heroes: characterDataContainer.results)
+                self.ui?.update(heroes: heroes)
             }
         } catch {
             print("Error fetching heroes: \(error)")

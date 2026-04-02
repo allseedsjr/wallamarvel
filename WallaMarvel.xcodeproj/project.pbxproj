@@ -35,6 +35,10 @@
 		1AA67B922F7E151B002C7F2E /* APIClientTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1AA67B912F7E151B002C7F2E /* APIClientTests.swift */; };
 		1AA67B942F7E1525002C7F2E /* MarvelDataSourceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1AA67B932F7E1525002C7F2E /* MarvelDataSourceTests.swift */; };
 		1AA67B962F7E152C002C7F2E /* MarvelRepositoryTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1AA67B952F7E152C002C7F2E /* MarvelRepositoryTests.swift */; };
+		1AA67BA02F7E1F82002C7F2E /* CharacterDataModelMappingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1AA67B9F2F7E1F82002C7F2E /* CharacterDataModelMappingTests.swift */; };
+		1AA67B992F7E1EA6002C7F2E /* Character.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1AA67B982F7E1EA6002C7F2E /* Character.swift */; };
+		1AA67B9C2F7E1EAB002C7F2E /* CharacterDataModel+Mapping.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1AA67B9B2F7E1EAB002C7F2E /* CharacterDataModel+Mapping.swift */; };
+		1AA67B9E2F7E1EDA002C7F2E /* Character+fixture.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1AA67B9D2F7E1EDA002C7F2E /* Character+fixture.swift */; };
 		1AC0347F2863214900E93178 /* GetHeroes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1AC0347E2863214900E93178 /* GetHeroes.swift */; };
 		1AE537BC2F7E045C008BABB4 /* PageInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1AE537BB2F7E0459008BABB4 /* PageInfo.swift */; };
 		1AE537BE2F7E0474008BABB4 /* Origin.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1AE537BD2F7E0472008BABB4 /* Origin.swift */; };
@@ -100,7 +104,11 @@
 		1AA67B8F2F7E1508002C7F2E /* MarvelDataSourceSpy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarvelDataSourceSpy.swift; sourceTree = "<group>"; };
 		1AA67B912F7E151B002C7F2E /* APIClientTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIClientTests.swift; sourceTree = "<group>"; };
 		1AA67B932F7E1525002C7F2E /* MarvelDataSourceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarvelDataSourceTests.swift; sourceTree = "<group>"; };
+		1AA67B9F2F7E1F82002C7F2E /* CharacterDataModelMappingTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CharacterDataModelMappingTests.swift; sourceTree = "<group>"; };
 		1AA67B952F7E152C002C7F2E /* MarvelRepositoryTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarvelRepositoryTests.swift; sourceTree = "<group>"; };
+		1AA67B982F7E1EA6002C7F2E /* Character.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Character.swift; sourceTree = "<group>"; };
+		1AA67B9B2F7E1EAB002C7F2E /* CharacterDataModel+Mapping.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CharacterDataModel+Mapping.swift"; sourceTree = "<group>"; };
+		1AA67B9D2F7E1EDA002C7F2E /* Character+fixture.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Character+fixture.swift"; sourceTree = "<group>"; };
 		1AC0347E2863214900E93178 /* GetHeroes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GetHeroes.swift; sourceTree = "<group>"; };
 		1AE537BB2F7E0459008BABB4 /* PageInfo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PageInfo.swift; sourceTree = "<group>"; };
 		1AE537BD2F7E0472008BABB4 /* Origin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Origin.swift; sourceTree = "<group>"; };
@@ -225,6 +233,7 @@
 			children = (
 				1A821ED72863081A0024D397 /* MarvelRepository.swift */,
 				1AC0347D286320F000E93178 /* UseCases */,
+				1AA67B972F7E1EA4002C7F2E /* Entities */,
 			);
 			path = Domain;
 			sourceTree = "<group>";
@@ -236,6 +245,7 @@
 				1A821EC82862FE3C0024D397 /* APIClient.swift */,
 				1A821ED2286302D40024D397 /* DataModel */,
 				1A821ECA2862FF910024D397 /* Helpers */,
+				1AA67B9A2F7E1EA8002C7F2E /* Mapping */,
 			);
 			path = Data;
 			sourceTree = "<group>";
@@ -299,9 +309,26 @@
 			isa = PBXGroup;
 			children = (
 				1AA67B912F7E151B002C7F2E /* APIClientTests.swift */,
+				1AA67B9F2F7E1F82002C7F2E /* CharacterDataModelMappingTests.swift */,
 				1AA67B932F7E1525002C7F2E /* MarvelDataSourceTests.swift */,
 			);
 			path = Data;
+			sourceTree = "<group>";
+		};
+		1AA67B972F7E1EA4002C7F2E /* Entities */ = {
+			isa = PBXGroup;
+			children = (
+				1AA67B982F7E1EA6002C7F2E /* Character.swift */,
+			);
+			path = Entities;
+			sourceTree = "<group>";
+		};
+		1AA67B9A2F7E1EA8002C7F2E /* Mapping */ = {
+			isa = PBXGroup;
+			children = (
+				1AA67B9B2F7E1EAB002C7F2E /* CharacterDataModel+Mapping.swift */,
+			);
+			path = Mapping;
 			sourceTree = "<group>";
 		};
 		1AC0347D286320F000E93178 /* UseCases */ = {
@@ -341,6 +368,7 @@
 				1AE537D22F7E0BE8008BABB4 /* Location+fixture.swift */,
 				1AE537D42F7E0BEC008BABB4 /* Thumbnail+fixture.swift */,
 				1AE537D62F7E0BFA008BABB4 /* CharacterDataModel+fixture.swift */,
+				1AA67B9D2F7E1EDA002C7F2E /* Character+fixture.swift */,
 			);
 			path = Fixtures;
 			sourceTree = "<group>";
@@ -490,12 +518,14 @@
 				1A3B732A286AE195007BF626 /* ListHeroesAdapter.swift in Sources */,
 				1A7B9BBF286D81B600EBC1A6 /* Thumbnail.swift in Sources */,
 				1A821EDA2863096C0024D397 /* ListHeroesPresenter.swift in Sources */,
+				1AA67B9C2F7E1EAB002C7F2E /* CharacterDataModel+Mapping.swift in Sources */,
 				1A0E3A9B2862F7E200132FCB /* SceneDelegate.swift in Sources */,
 				1A3B7326286ADD1E007BF626 /* ListHeroesTableView.swift in Sources */,
 				1A3B7328286ADEE6007BF626 /* ListHeroesTableViewCell.swift in Sources */,
 				1A821ED4286302EC0024D397 /* CharacterResponseDataModel.swift in Sources */,
 				1A821EC92862FE3C0024D397 /* APIClient.swift in Sources */,
 				1AE537BE2F7E0474008BABB4 /* Origin.swift in Sources */,
+				1AA67B992F7E1EA6002C7F2E /* Character.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -508,6 +538,7 @@
 				1AA67B902F7E1508002C7F2E /* MarvelDataSourceSpy.swift in Sources */,
 				1AA67B8C2F7E1501002C7F2E /* URLProtocolStub.swift in Sources */,
 				1AE537C72F7E08E0008BABB4 /* ListHeroesPresenterTests.swift in Sources */,
+				1AA67B9E2F7E1EDA002C7F2E /* Character+fixture.swift in Sources */,
 				1AE537D72F7E0BFA008BABB4 /* CharacterDataModel+fixture.swift in Sources */,
 				1AE537CD2F7E0B6C008BABB4 /* CharacterDataContainer+fixture.swift in Sources */,
 				1AA67B822F7E13EF002C7F2E /* MarvelRepositorySpy.swift in Sources */,

@@ -17,8 +17,8 @@ final class ListHeroesPresenterTests: XCTestCase {
     }
 
     func test_whenGetHeroes_succeeds_shouldUpdateUI() async {
-        let expectedHeroes = [CharacterDataModel.fixture()]
-        getHeroesUseCaseSpy.result = .fixture(results: expectedHeroes)
+        let expectedHeroes = [Character.fixture()]
+        getHeroesUseCaseSpy.result = expectedHeroes
 
         let uiSpy = ListHeroesUISpy()
         sut.ui = uiSpy

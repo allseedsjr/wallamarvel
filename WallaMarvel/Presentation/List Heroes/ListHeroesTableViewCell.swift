@@ -48,8 +48,8 @@ final class ListHeroesTableViewCell: UITableViewCell {
         ])
     }
     
-    func configure(model: CharacterDataModel) {
-        heroeImageView.kf.setImage(with: URL(string: model.image))
+    func configure(model: Character) {
+        heroeImageView.kf.setImage(with: URL(string: model.imageURL))
         heroeName.text = model.name
     }
 }

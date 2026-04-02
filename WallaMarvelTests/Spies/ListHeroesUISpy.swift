@@ -9,7 +9,7 @@ final class ListHeroesUISpy: ListHeroesUI {
         self.updateExpectation = updateExpectation
     }
 
-    func update(heroes: [CharacterDataModel]) {
+    func update(heroes: [Character]) {
         updatedHeroesCount = heroes.count
         updateExpectation?.fulfill()
     }

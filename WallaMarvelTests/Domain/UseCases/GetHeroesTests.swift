@@ -12,12 +12,12 @@ final class GetHeroesTests: XCTestCase {
     }
 
     func test_whenExecute_succeeds_shouldReturnResultFromRepository() async throws {
-        let expectedContainer = CharacterDataContainer.fixture(results: [CharacterDataModel.fixture()])
-        repositorySpy.result = expectedContainer
+        let expectedHeroes = [Character.fixture()]
+        repositorySpy.result = expectedHeroes
 
         let result = try await sut.execute()
 
-        XCTAssertEqual(result.results.count, expectedContainer.results.count)
+        XCTAssertEqual(result.count, expectedHeroes.count)
     }
 
     func test_whenExecute_fails_shouldThrowError() async {

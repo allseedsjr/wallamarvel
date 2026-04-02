@@ -17,7 +17,7 @@ final class MarvelRepositoryTests: XCTestCase {
 
         let result = try await sut.getHeroes()
 
-        XCTAssertEqual(result.results.count, expectedContainer.results.count)
+        XCTAssertEqual(result.count, expectedContainer.results.count)
     }
 
     func test_whenGetHeroes_fails_shouldThrowError() async {
