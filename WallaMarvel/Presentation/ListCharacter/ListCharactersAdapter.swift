@@ -1,8 +1,8 @@
 import Foundation
 import UIKit
 
-final class ListHeroesAdapter: NSObject, UITableViewDataSource {
-    var heroes: [CharacterDataModel] {
+final class ListCharactersAdapter: NSObject, UITableViewDataSource {
+    var characters: [Character] {
         didSet {
             DispatchQueue.main.async {
                 self.tableView.reloadData()
@@ -12,21 +12,21 @@ final class ListHeroesAdapter: NSObject, UITableViewDataSource {
     
     private let tableView: UITableView
     
-    init(tableView: UITableView, heroes: [CharacterDataModel] = []) {
+    init(tableView: UITableView, characters: [Character] = []) {
         self.tableView = tableView
-        self.heroes = heroes
+        self.characters = characters
         super.init()
         self.tableView.dataSource = self
     }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        heroes.count
+        characters.count
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: "ListHeroesTableViewCell", for: indexPath) as! ListHeroesTableViewCell
+        let cell = tableView.dequeueReusableCell(withIdentifier: "ListCharactersTableViewCell", for: indexPath) as! ListCharactersTableViewCell
         
-        let model = heroes[indexPath.row]
+        let model = characters[indexPath.row]
         cell.configure(model: model)
         
         return cell

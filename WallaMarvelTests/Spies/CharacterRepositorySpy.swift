@@ -1,11 +1,11 @@
 @testable import WallaMarvel
 
-final class APIClientSpy: APIClientProtocol {
+final class CharacterRepositorySpy: CharacterRepositoryProtocol {
     private(set) var getCharactersCalled: Bool = false
-    var result: CharacterDataContainer = .fixture()
+    var result: [Character] = []
     var error: Error?
 
-    func getCharacters() async throws -> CharacterDataContainer {
+    func getCharacters() async throws -> [Character] {
         getCharactersCalled = true
         if let error {
             throw error

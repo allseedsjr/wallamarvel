@@ -1,7 +1,7 @@
 import Foundation
 
 protocol APIClientProtocol {
-    func getHeroes() async throws -> CharacterDataContainer
+    func getCharacters() async throws -> CharacterDataContainer
 }
 
 final class APIClient: APIClientProtocol {
@@ -11,7 +11,7 @@ final class APIClient: APIClientProtocol {
         self.session = session
     }
     
-    func getHeroes() async throws -> CharacterDataContainer {
+    func getCharacters() async throws -> CharacterDataContainer {
         let endpoint = "https://rickandmortyapi.com/api/character"
         
         guard let url = URL(string: endpoint) else {

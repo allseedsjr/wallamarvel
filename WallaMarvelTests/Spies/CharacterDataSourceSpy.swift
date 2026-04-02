@@ -1,6 +1,6 @@
 @testable import WallaMarvel
 
-final class APIClientSpy: APIClientProtocol {
+final class CharacterDataSourceSpy: CharacterDataSourceProtocol {
     private(set) var getCharactersCalled: Bool = false
     var result: CharacterDataContainer = .fixture()
     var error: Error?

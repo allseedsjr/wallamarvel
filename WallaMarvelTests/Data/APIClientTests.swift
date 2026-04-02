@@ -27,7 +27,7 @@ final class APIClientTests: XCTestCase {
         }))
 
         let sut = APIClient(session: session)
-        _ = try await sut.getHeroes()
+        _ = try await sut.getCharacters()
 
         XCTAssertEqual(requestedURL, endpoint)
     }
@@ -38,7 +38,7 @@ final class APIClientTests: XCTestCase {
         URLProtocolStub.startIntercepting(with: .init(data: data, response: response, error: nil, requestObserver: nil))
 
         let sut = APIClient(session: session)
-        let result = try await sut.getHeroes()
+        let result = try await sut.getCharacters()
 
         XCTAssertEqual(result.results.count, 1)
     }
@@ -49,7 +49,7 @@ final class APIClientTests: XCTestCase {
         let sut = APIClient(session: session)
 
         do {
-            _ = try await sut.getHeroes()
+            _ = try await sut.getCharacters()
             XCTFail("Expected error to be thrown")
         } catch {
             XCTAssertTrue(true)
@@ -63,7 +63,7 @@ final class APIClientTests: XCTestCase {
         let sut = APIClient(session: session)
 
         do {
-            _ = try await sut.getHeroes()
+            _ = try await sut.getCharacters()
             XCTFail("Expected error to be thrown")
         } catch {
             XCTAssertTrue(true)

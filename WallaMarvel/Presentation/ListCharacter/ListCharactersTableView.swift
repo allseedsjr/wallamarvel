@@ -1,14 +1,14 @@
 import Foundation
 import UIKit
 
-final class ListHeroesView: UIView {
+final class ListCharactersView: UIView {
     enum Constant {
         static let estimatedRowHeight: CGFloat = 120
     }
     
-    let heroesTableView: UITableView = {
+    let charactersTableView: UITableView = {
         let tableView = UITableView()
-        tableView.register(ListHeroesTableViewCell.self, forCellReuseIdentifier: "ListHeroesTableViewCell")
+        tableView.register(ListCharactersTableViewCell.self, forCellReuseIdentifier: "ListCharactersTableViewCell")
         tableView.translatesAutoresizingMaskIntoConstraints = false
         tableView.rowHeight = UITableView.automaticDimension
         tableView.estimatedRowHeight = Constant.estimatedRowHeight
@@ -30,15 +30,15 @@ final class ListHeroesView: UIView {
     }
     
     private func addSubviews() {
-        addSubview(heroesTableView)
+        addSubview(charactersTableView)
     }
     
     private func addContraints() {
         NSLayoutConstraint.activate([
-            heroesTableView.leadingAnchor.constraint(equalTo: leadingAnchor),
-            heroesTableView.trailingAnchor.constraint(equalTo: trailingAnchor),
-            heroesTableView.topAnchor.constraint(equalTo: topAnchor),
-            heroesTableView.bottomAnchor.constraint(equalTo: bottomAnchor),
+            charactersTableView.leadingAnchor.constraint(equalTo: leadingAnchor),
+            charactersTableView.trailingAnchor.constraint(equalTo: trailingAnchor),
+            charactersTableView.topAnchor.constraint(equalTo: topAnchor),
+            charactersTableView.bottomAnchor.constraint(equalTo: bottomAnchor),
         ])
     }
 }
