@@ -3,7 +3,7 @@ import Foundation
 protocol ListHeroesPresenterProtocol: AnyObject {
     var ui: ListHeroesUI? { get set }
     func screenTitle() -> String
-    func getHeroes()
+    func getHeroes() async
 }
 
 protocol ListHeroesUI: AnyObject {
@@ -24,11 +24,14 @@ final class ListHeroesPresenter: ListHeroesPresenterProtocol {
     
     // MARK: UseCases
     
-    func getHeroes() {
-        getHeroesUseCase.execute { characterDataContainer in
-            print("Characters \(characterDataContainer.characters)")
-            self.ui?.update(heroes: characterDataContainer.characters)
+    func getHeroes() async {
+        do {
+            let characterDataContainer = try await getHeroesUseCase.execute()
+            await MainActor.run {
+                self.ui?.update(heroes: characterDataContainer.results)
+            }
+        } catch {
+            print("Error fetching heroes: \(error)")
         }
     }
 }
-

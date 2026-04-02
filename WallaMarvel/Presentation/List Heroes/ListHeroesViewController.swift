@@ -13,8 +13,10 @@ final class ListHeroesViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         listHeroesProvider = ListHeroesAdapter(tableView: mainView.heroesTableView)
-        presenter?.getHeroes()
         presenter?.ui = self
+        Task { [weak self] in
+            await self?.presenter?.getHeroes()
+        }
         
         title = presenter?.screenTitle()
         
@@ -34,7 +36,6 @@ extension ListHeroesViewController: UITableViewDelegate {
         let listHeroesViewController = ListHeroesViewController()
         listHeroesViewController.presenter = presenter
         
-        navigationController?.pushViewController(listHeroesViewController, animated: true)
+        // TODO: add navigation in another task
     }
 }
-
