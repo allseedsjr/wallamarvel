@@ -26,7 +26,9 @@ struct Character: Equatable {
         locationName: String,
         episodeCount: Int
     ) throws {
-        guard !imageURL.isEmpty, URL(string: imageURL) != nil else {
+        guard !imageURL.isEmpty,
+              let url = URL(string: imageURL),
+              url.scheme == "https" || url.scheme == "http" else {
             throw CharacterMappingError.invalidImageURL
         }
         
@@ -40,4 +42,9 @@ struct Character: Equatable {
         self.locationName = locationName
         self.episodeCount = episodeCount
     }
+}
+
+struct CharactersPage {
+    let characters: [Character]
+    let hasNextPage: Bool
 }

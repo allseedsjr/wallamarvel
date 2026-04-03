@@ -10,9 +10,8 @@ final class CharacterDataModelMappingTests: XCTestCase {
             status: "Alive",
             species: "Human",
             gender: "Male",
-            image: "https://example.com/morty.png",
             origin: Origin.fixture(name: "Earth C-137"),
-            location: Location.fixture(name: "Dimension C-500"),
+            location: Location.fixture(name: "Dimension C-500"), image: "https://example.com/morty.png",
             episode: ["1", "2", "3"]
         )
         

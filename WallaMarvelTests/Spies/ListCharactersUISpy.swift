@@ -3,8 +3,14 @@ import XCTest
 
 final class ListCharactersUISpy: ListCharactersUI {
     private(set) var updatedCharactersCount: Int?
+    private(set) var appendedCharacters: [Character] = []
     private(set) var lastShownError: AppError?
+    private(set) var lastPaginationError: AppError?
     private(set) var isLoadingShown: Bool = false
+    private(set) var showLoadingWasCalled: Bool = false
+    private(set) var hideLoadingWasCalled: Bool = false
+    private(set) var isPaginationLoadingShown: Bool = false
+    private(set) var showPaginationLoadingWasCalled: Bool = false
     private let updateExpectation: XCTestExpectation?
 
     init(updateExpectation: XCTestExpectation? = nil) {
@@ -13,19 +19,37 @@ final class ListCharactersUISpy: ListCharactersUI {
 
     func showLoading() {
         isLoadingShown = true
+        showLoadingWasCalled = true
     }
-    
+
     func hideLoading() {
         isLoadingShown = false
+        hideLoadingWasCalled = true
     }
 
     func update(characters: [Character]) {
         updatedCharactersCount = characters.count
         updateExpectation?.fulfill()
     }
-    
+
+    func appendCharacters(_ newCharacters: [Character]) {
+        appendedCharacters.append(contentsOf: newCharacters)
+    }
+
+    func showPaginationLoading() {
+        isPaginationLoadingShown = true
+        showPaginationLoadingWasCalled = true
+    }
+
+    func hidePaginationLoading() {
+        isPaginationLoadingShown = false
+    }
+
     func showError(_ error: AppError) {
         lastShownError = error
     }
-}
+
+    func showPaginationError(_ error: AppError) {
+        lastPaginationError = error
+    }
 }

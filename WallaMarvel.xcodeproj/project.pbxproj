@@ -25,6 +25,7 @@
 		1A821ED6286305590024D397 /* CharacterDataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A821ED5286305590024D397 /* CharacterDataSource.swift */; };
 		1A821ED82863081A0024D397 /* CharacterRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A821ED72863081A0024D397 /* CharacterRepository.swift */; };
 		1A821EDA2863096C0024D397 /* ListCharactersPresenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A821ED92863096C0024D397 /* ListCharactersPresenter.swift */; };
+		1A86FC102F7F75B9000A34FE /* CharacterDataModelMappingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1AA67B9F2F7E1F82002C7F2E /* CharacterDataModelMappingTests.swift */; };
 		1AA67B802F7E1186002C7F2E /* ListCharactersUISpy.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1AA67B7F2F7E1186002C7F2E /* ListCharactersUISpy.swift */; };
 		1AA67B822F7E13EF002C7F2E /* CharacterRepositorySpy.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1AA67B812F7E13EF002C7F2E /* CharacterRepositorySpy.swift */; };
 		1AA67B862F7E1407002C7F2E /* GetCharactersTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1AA67B852F7E1407002C7F2E /* GetCharactersTests.swift */; };
@@ -586,6 +587,7 @@
 				1AA67B9E2F7E1EDA002C7F2E /* Character+fixture.swift in Sources */,
 				1AE537D72F7E0BFA008BABB4 /* CharacterDataModel+fixture.swift in Sources */,
 				1AE537CD2F7E0B6C008BABB4 /* CharacterDataContainer+fixture.swift in Sources */,
+				1A86FC102F7F75B9000A34FE /* CharacterDataModelMappingTests.swift in Sources */,
 				1AA67B822F7E13EF002C7F2E /* CharacterRepositorySpy.swift in Sources */,
 				1AE537CF2F7E0BE1008BABB4 /* PageInfo+fixture.swift in Sources */,
 				1AA67B942F7E1525002C7F2E /* CharacterDataSourceTests.swift in Sources */,
@@ -758,8 +760,10 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = FB627NQ75M;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = WallaMarvel/Info.plist;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
@@ -772,8 +776,9 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.wallapop.WallaMarvel;
+				PRODUCT_BUNDLE_IDENTIFIER = com.josealcidesjunior.WallaMarvel;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -785,8 +790,10 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = FB627NQ75M;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = WallaMarvel/Info.plist;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
@@ -799,8 +806,9 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.wallapop.WallaMarvel;
+				PRODUCT_BUNDLE_IDENTIFIER = com.josealcidesjunior.WallaMarvel;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";

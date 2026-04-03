@@ -1,14 +1,19 @@
 import XCTest
 @testable import WallaMarvel
 
+@MainActor
 final class ListCharactersPresenterTests: XCTestCase {
     private let getCharactersUseCaseSpy = GetCharactersUseCaseSpy()
     private lazy var sut = ListCharactersPresenter(getCharactersUseCase: getCharactersUseCaseSpy)
-    
+
+    // MARK: - screenTitle
+
     func test_whenScreenTitle_called_shouldReturnCorrectTitle() {
         let result = sut.screenTitle()
         XCTAssertEqual(result, "List of Characters")
     }
+
+    // MARK: - getCharacters (initial load)
 
     func test_whenGetCharacters_called_shouldExecuteUseCase() async {
         await sut.getCharacters()
@@ -16,9 +21,15 @@ final class ListCharactersPresenterTests: XCTestCase {
         XCTAssertTrue(getCharactersUseCaseSpy.executeCalled)
     }
 
+    func test_whenGetCharacters_called_shouldRequestPageOne() async {
+        await sut.getCharacters()
+
+        XCTAssertEqual(getCharactersUseCaseSpy.lastRequestedPage, 1)
+    }
+
     func test_whenGetCharacters_succeeds_shouldUpdateUI() async {
         let expectedCharacters = [Character.fixture()]
-        getCharactersUseCaseSpy.result = expectedCharacters
+        getCharactersUseCaseSpy.pageResult = CharactersPage(characters: expectedCharacters, hasNextPage: false)
 
         let uiSpy = ListCharactersUISpy()
         sut.ui = uiSpy
@@ -39,28 +50,29 @@ final class ListCharactersPresenterTests: XCTestCase {
         XCTAssertTrue(getCharactersUseCaseSpy.executeCalled)
         XCTAssertNil(uiSpy.updatedCharactersCount)
     }
-    
+
     func test_whenGetCharacters_called_shouldShowLoading() async {
         let uiSpy = ListCharactersUISpy()
         sut.ui = uiSpy
 
         await sut.getCharacters()
 
-        XCTAssertTrue(uiSpy.isLoadingShown)
+        XCTAssertTrue(uiSpy.showLoadingWasCalled)
     }
-    
+
     func test_whenGetCharacters_succeeds_shouldHideLoading() async {
         let expectedCharacters = [Character.fixture()]
-        getCharactersUseCaseSpy.result = expectedCharacters
-        
+        getCharactersUseCaseSpy.pageResult = CharactersPage(characters: expectedCharacters, hasNextPage: false)
+
         let uiSpy = ListCharactersUISpy()
         sut.ui = uiSpy
 
         await sut.getCharacters()
 
+        XCTAssertTrue(uiSpy.hideLoadingWasCalled)
         XCTAssertFalse(uiSpy.isLoadingShown)
     }
-    
+
     func test_whenGetCharacters_withAppError_shouldShowErrorWithUserFriendlyMessage() async {
         let appError = AppError.network("Connection failed")
         getCharactersUseCaseSpy.error = appError
@@ -70,9 +82,10 @@ final class ListCharactersPresenterTests: XCTestCase {
 
         await sut.getCharacters()
 
+        XCTAssertTrue(uiSpy.hideLoadingWasCalled)
         XCTAssertEqual(uiSpy.lastShownError, appError)
     }
-    
+
     func test_whenGetCharacters_withGenericError_shouldMapToAppError() async {
         getCharactersUseCaseSpy.error = TestError.any
 
@@ -83,3 +96,144 @@ final class ListCharactersPresenterTests: XCTestCase {
 
         XCTAssertNotNil(uiSpy.lastShownError)
     }
+
+    // MARK: - loadNextPage
+
+    func test_whenLoadNextPage_withoutHasNextPage_shouldNotCallUseCase() async {
+        getCharactersUseCaseSpy.pageResult = CharactersPage(characters: [.fixture()], hasNextPage: false)
+        let uiSpy = ListCharactersUISpy()
+        sut.ui = uiSpy
+
+        await sut.getCharacters()
+        getCharactersUseCaseSpy.resetCallTracking()
+
+        await sut.loadNextPage()
+
+        XCTAssertFalse(getCharactersUseCaseSpy.executeCalled)
+    }
+
+    func test_whenLoadNextPage_withHasNextPage_shouldRequestNextPage() async {
+        getCharactersUseCaseSpy.pageResult = CharactersPage(characters: [.fixture()], hasNextPage: true)
+        let uiSpy = ListCharactersUISpy()
+        sut.ui = uiSpy
+
+        await sut.getCharacters()
+        getCharactersUseCaseSpy.pageResult = CharactersPage(characters: [.fixture(id: 2)], hasNextPage: false)
+
+        await sut.loadNextPage()
+
+        XCTAssertEqual(getCharactersUseCaseSpy.lastRequestedPage, 2)
+    }
+
+    func test_whenLoadNextPage_succeeds_shouldAppendCharactersToUI() async {
+        getCharactersUseCaseSpy.pageResult = CharactersPage(characters: [.fixture()], hasNextPage: true)
+        let uiSpy = ListCharactersUISpy()
+        sut.ui = uiSpy
+
+        await sut.getCharacters()
+
+        let nextPageCharacters = [Character.fixture(id: 2), Character.fixture(id: 3)]
+        getCharactersUseCaseSpy.pageResult = CharactersPage(characters: nextPageCharacters, hasNextPage: false)
+
+        await sut.loadNextPage()
+
+        XCTAssertEqual(uiSpy.appendedCharacters.count, nextPageCharacters.count)
+    }
+
+    func test_whenLoadNextPage_succeeds_shouldShowAndHidePaginationLoading() async {
+        getCharactersUseCaseSpy.pageResult = CharactersPage(characters: [.fixture()], hasNextPage: true)
+        let uiSpy = ListCharactersUISpy()
+        sut.ui = uiSpy
+
+        await sut.getCharacters()
+        getCharactersUseCaseSpy.pageResult = CharactersPage(characters: [.fixture(id: 2)], hasNextPage: false)
+
+        await sut.loadNextPage()
+
+        XCTAssertTrue(uiSpy.showPaginationLoadingWasCalled)
+        XCTAssertFalse(uiSpy.isPaginationLoadingShown)
+    }
+
+    func test_whenLoadNextPage_fails_shouldShowPaginationError() async {
+        getCharactersUseCaseSpy.pageResult = CharactersPage(characters: [.fixture()], hasNextPage: true)
+        let uiSpy = ListCharactersUISpy()
+        sut.ui = uiSpy
+
+        await sut.getCharacters()
+
+        getCharactersUseCaseSpy.error = AppError.network("Page load failed")
+        await sut.loadNextPage()
+
+        XCTAssertNotNil(uiSpy.lastPaginationError)
+    }
+
+    func test_whenLoadNextPage_fails_shouldNotUpdateExistingCharacters() async {
+        let initialCharacters = [Character.fixture()]
+        getCharactersUseCaseSpy.pageResult = CharactersPage(characters: initialCharacters, hasNextPage: true)
+        let uiSpy = ListCharactersUISpy()
+        sut.ui = uiSpy
+
+        await sut.getCharacters()
+
+        getCharactersUseCaseSpy.error = AppError.network("Page load failed")
+        await sut.loadNextPage()
+
+        XCTAssertEqual(uiSpy.updatedCharactersCount, initialCharacters.count)
+        XCTAssertTrue(uiSpy.appendedCharacters.isEmpty)
+    }
+
+    func test_whenLoadNextPage_fails_shouldAllowRetryViaRetryNextPage() async {
+        getCharactersUseCaseSpy.pageResult = CharactersPage(characters: [.fixture()], hasNextPage: true)
+        let uiSpy = ListCharactersUISpy()
+        sut.ui = uiSpy
+
+        await sut.getCharacters()
+
+        getCharactersUseCaseSpy.error = AppError.network("Page load failed")
+        await sut.loadNextPage()
+
+        getCharactersUseCaseSpy.error = nil
+        getCharactersUseCaseSpy.pageResult = CharactersPage(characters: [.fixture(id: 2)], hasNextPage: false)
+        await sut.retryNextPage()
+
+        XCTAssertEqual(uiSpy.appendedCharacters.count, 1)
+    }
+
+    func test_whenLoadNextPage_fails_shouldBlockSubsequentAutoLoads() async {
+        getCharactersUseCaseSpy.pageResult = CharactersPage(characters: [.fixture()], hasNextPage: true)
+        let uiSpy = ListCharactersUISpy()
+        sut.ui = uiSpy
+
+        await sut.getCharacters()
+
+        getCharactersUseCaseSpy.error = AppError.network("failed")
+        await sut.loadNextPage()
+        getCharactersUseCaseSpy.error = nil
+        getCharactersUseCaseSpy.resetCallTracking()
+
+        // Simulating willDisplay triggering again after error — should be blocked
+        await sut.loadNextPage()
+
+        XCTAssertFalse(getCharactersUseCaseSpy.executeCalled)
+    }
+
+    func test_whenRetryNextPage_afterError_shouldCallUseCaseAgain() async {
+        getCharactersUseCaseSpy.pageResult = CharactersPage(characters: [.fixture()], hasNextPage: true)
+        let uiSpy = ListCharactersUISpy()
+        sut.ui = uiSpy
+
+        await sut.getCharacters()
+
+        getCharactersUseCaseSpy.error = AppError.network("failed")
+        await sut.loadNextPage()
+
+        getCharactersUseCaseSpy.error = nil
+        getCharactersUseCaseSpy.pageResult = CharactersPage(characters: [.fixture(id: 2)], hasNextPage: false)
+        getCharactersUseCaseSpy.resetCallTracking()
+
+        await sut.retryNextPage()
+
+        XCTAssertTrue(getCharactersUseCaseSpy.executeCalled)
+        XCTAssertEqual(uiSpy.appendedCharacters.count, 1)
+    }
+}

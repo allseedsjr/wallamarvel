@@ -1,7 +1,7 @@
 import Foundation
 
 protocol CharacterDataSourceProtocol {
-    func getCharacters() async throws -> CharacterDataContainer
+    func getCharacters(page: Int) async throws -> CharacterDataContainer
 }
 
 final class CharacterDataSource: CharacterDataSourceProtocol {
@@ -11,9 +11,9 @@ final class CharacterDataSource: CharacterDataSourceProtocol {
         self.apiClient = apiClient
     }
     
-    func getCharacters() async throws -> CharacterDataContainer {
+    func getCharacters(page: Int) async throws -> CharacterDataContainer {
         do {
-            return try await apiClient.getCharacters()
+            return try await apiClient.getCharacters(page: page)
         } catch {
             throw AppErrorMapper.map(error)
         }
