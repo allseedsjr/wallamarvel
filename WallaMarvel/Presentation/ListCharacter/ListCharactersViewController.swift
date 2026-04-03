@@ -5,6 +5,7 @@ final class ListCharactersViewController: UIViewController {
 
     var presenter: ListCharactersPresenterProtocol?
     var listCharactersProvider: ListCharactersAdapter?
+    weak var coordinator: ListCharactersCoordinatorProtocol?
 
     private let paginationThreshold = 5
     private var isPaginatingFromScroll = false
@@ -81,7 +82,8 @@ extension ListCharactersViewController: ListCharactersUI {
 
 extension ListCharactersViewController: UITableViewDelegate {
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        // TODO: add navigation in another task
+        guard let character = listCharactersProvider?.characters[indexPath.row] else { return }
+        coordinator?.showDetail(for: character)
     }
 
     func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
