@@ -33,6 +33,14 @@ final class ListCharactersTableViewCell: UITableViewCell {
     private func setup() {
         addSubviews()
         addContraints()
+        setupAccessibility()
+    }
+
+    private func setupAccessibility() {
+        isAccessibilityElement = true
+        accessibilityHint = "Double tap to see more details"
+        characterImageView.isAccessibilityElement = false
+        characterName.isAccessibilityElement = false
     }
     
     private func addSubviews() {
@@ -49,12 +57,15 @@ final class ListCharactersTableViewCell: UITableViewCell {
             characterImageView.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -Constants.outerSpacing),
             
             characterName.leadingAnchor.constraint(equalTo: characterImageView.trailingAnchor, constant: Constants.outerSpacing),
+            characterName.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -Constants.outerSpacing),
             characterName.topAnchor.constraint(equalTo: characterImageView.topAnchor, constant: Constants.innerSpacing),
+            characterName.centerYAnchor.constraint(equalTo: characterImageView.centerYAnchor),
         ])
     }
     
     func configure(model: Character) {
         characterImageView.kf.setImage(with: URL(string: model.imageURL))
         characterName.text = model.name
+        accessibilityLabel = "Character: \(model.name)."
     }
 }

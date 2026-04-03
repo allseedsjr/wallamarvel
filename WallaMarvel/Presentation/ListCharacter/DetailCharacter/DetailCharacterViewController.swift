@@ -177,6 +177,9 @@ final class DetailCharacterViewController: UIViewController {
         ])
         contentStack.addArrangedSubview(container)
 
+        imageView.isAccessibilityElement = false
+        container.isAccessibilityElement = false
+
         if let url = URL(string: character.imageURL) {
             imageView.kf.setImage(with: url, options: [.transition(.fade(Constants.imageFadeDuration)), .cacheOriginalImage])
         }
@@ -184,15 +187,17 @@ final class DetailCharacterViewController: UIViewController {
 
     private func addStatusBadge() {
         let status = character.status.lowercased()
-        let (text, color): (String, UIColor) = {
+        let (text, color, accessibleStatus): (String, UIColor, String) = {
             switch status {
-            case "alive": return (Strings.statusAlive, .systemGreen)
-            case "dead":  return (Strings.statusDead, .systemRed)
-            default:      return (Strings.statusUnknown, .systemGray)
+            case "alive": return (Strings.statusAlive, .systemGreen, "Alive")
+            case "dead":  return (Strings.statusDead, .systemRed, "Dead")
+            default:      return (Strings.statusUnknown, .systemGray, "Unknown")
             }
         }()
         statusBadge.text = "  \(text)  "
         statusBadge.backgroundColor = color
+        statusBadge.isAccessibilityElement = true
+        statusBadge.accessibilityLabel = "Status: \(accessibleStatus)"
 
         let container = UIView()
         container.addSubview(statusBadge)
@@ -229,17 +234,21 @@ final class DetailCharacterViewController: UIViewController {
         row.axis = .horizontal
         row.spacing = Constants.rowSpacing
         row.distribution = .equalSpacing
+        row.isAccessibilityElement = true
+        row.accessibilityLabel = "\(title): \(value)"
 
         let titleLabel = UILabel()
         titleLabel.text = title
         titleLabel.font = .systemFont(ofSize: Constants.rowFontSize, weight: .semibold)
         titleLabel.setContentHuggingPriority(.defaultHigh, for: .horizontal)
+        titleLabel.isAccessibilityElement = false
 
         let valueLabel = UILabel()
         valueLabel.text = value
         valueLabel.font = .systemFont(ofSize: Constants.rowFontSize)
         valueLabel.textAlignment = .right
         valueLabel.numberOfLines = 0
+        valueLabel.isAccessibilityElement = false
 
         row.addArrangedSubview(titleLabel)
         row.addArrangedSubview(valueLabel)
@@ -266,6 +275,8 @@ extension DetailCharacterViewController: DetailCharacterUI {
     func showEpisode(_ episode: Episode) {
         episodeLoadingIndicator.stopAnimating()
         episodeInfoLabel.text = "\(episode.name) (\(episode.code))\n\(episode.airDate)"
+        episodeInfoLabel.isAccessibilityElement = true
+        episodeInfoLabel.accessibilityLabel = "First seen in: \(episode.name) (\(episode.code)), \(episode.airDate)"
         episodeInfoLabel.isHidden = false
         episodeErrorLabel.isHidden = true
         retryButton.isHidden = true
