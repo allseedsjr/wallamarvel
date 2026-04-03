@@ -2,7 +2,7 @@ import XCTest
 @testable import WallaMarvel
 
 final class APIClientTests: XCTestCase {
-    private let endpoint = URL(string: "https://rickandmortyapi.com/api/character")
+    private let baseEndpoint = URL(string: "https://rickandmortyapi.com/api/character")
     private var session: URLSession!
 
     override func setUp() {
@@ -18,56 +18,123 @@ final class APIClientTests: XCTestCase {
         super.tearDown()
     }
 
-    func test_whenGetHeroes_called_shouldRequestCorrectURL() async throws {
+    func test_whenGetCharacters_called_shouldRequestCorrectBaseURL() async throws {
         var requestedURL: URL?
         let data = makeValidResponseData()
-        let response = HTTPURLResponse(url: endpoint!, statusCode: 200, httpVersion: nil, headerFields: nil)
+        let response = HTTPURLResponse(url: baseEndpoint!, statusCode: 200, httpVersion: nil, headerFields: nil)
         URLProtocolStub.startIntercepting(with: .init(data: data, response: response, error: nil, requestObserver: { request in
             requestedURL = request.url
         }))
 
         let sut = APIClient(session: session)
-        _ = try await sut.getCharacters()
+        _ = try await sut.getCharacters(page: 1)
 
-        XCTAssertEqual(requestedURL, endpoint)
+        XCTAssertEqual(requestedURL?.host, "rickandmortyapi.com")
+        XCTAssertEqual(requestedURL?.path, "/api/character")
     }
 
-    func test_whenGetHeroes_succeeds_shouldReturnDecodedModel() async throws {
+    func test_whenGetCharacters_called_shouldIncludePageQueryParameter() async throws {
+        var requestedURL: URL?
         let data = makeValidResponseData()
-        let response = HTTPURLResponse(url: endpoint!, statusCode: 200, httpVersion: nil, headerFields: nil)
+        let response = HTTPURLResponse(url: baseEndpoint!, statusCode: 200, httpVersion: nil, headerFields: nil)
+        URLProtocolStub.startIntercepting(with: .init(data: data, response: response, error: nil, requestObserver: { request in
+            requestedURL = request.url
+        }))
+
+        let sut = APIClient(session: session)
+        _ = try await sut.getCharacters(page: 3)
+
+        let components = URLComponents(url: requestedURL!, resolvingAgainstBaseURL: false)
+        let pageValue = components?.queryItems?.first(where: { $0.name == "page" })?.value
+        XCTAssertEqual(pageValue, "3")
+    }
+
+    func test_whenGetCharacters_succeeds_shouldReturnDecodedModel() async throws {
+        let data = makeValidResponseData()
+        let response = HTTPURLResponse(url: baseEndpoint!, statusCode: 200, httpVersion: nil, headerFields: nil)
         URLProtocolStub.startIntercepting(with: .init(data: data, response: response, error: nil, requestObserver: nil))
 
         let sut = APIClient(session: session)
-        let result = try await sut.getCharacters()
+        let result = try await sut.getCharacters(page: 1)
 
         XCTAssertEqual(result.results.count, 1)
     }
 
-    func test_whenGetHeroes_sessionReturnsError_shouldThrow() async {
+    func test_whenGetCharacters_sessionReturnsError_shouldThrow() async {
         URLProtocolStub.startIntercepting(with: .init(data: nil, response: nil, error: TestError.any, requestObserver: nil))
 
-        let sut = APIClient(session: session)
+        let sut = APIClient(session: session, maxRetries: 1, retryDelay: 0)
 
         do {
-            _ = try await sut.getCharacters()
+            _ = try await sut.getCharacters(page: 1)
             XCTFail("Expected error to be thrown")
         } catch {
             XCTAssertTrue(true)
         }
     }
 
-    func test_whenGetHeroes_receivesInvalidData_shouldThrow() async {
-        let response = HTTPURLResponse(url: endpoint!, statusCode: 200, httpVersion: nil, headerFields: nil)
+    func test_whenGetCharacters_receivesInvalidData_shouldThrow() async {
+        let response = HTTPURLResponse(url: baseEndpoint!, statusCode: 200, httpVersion: nil, headerFields: nil)
         URLProtocolStub.startIntercepting(with: .init(data: Data("invalid".utf8), response: response, error: nil, requestObserver: nil))
 
-        let sut = APIClient(session: session)
+        let sut = APIClient(session: session, maxRetries: 1, retryDelay: 0)
 
         do {
-            _ = try await sut.getCharacters()
+            _ = try await sut.getCharacters(page: 1)
             XCTFail("Expected error to be thrown")
         } catch {
             XCTAssertTrue(true)
         }
+    }
+
+    // MARK: - Retry
+
+    func test_whenGetCharacters_failsOnFirstAttempt_shouldRetryAndSucceed() async throws {
+        let successData = makeValidResponseData()
+        let successResponse = HTTPURLResponse(url: baseEndpoint!, statusCode: 200, httpVersion: nil, headerFields: nil)
+
+        URLProtocolStub.startIntercepting(withSequence: [
+            .init(data: nil, response: nil, error: URLError(.networkConnectionLost), requestObserver: nil),
+            .init(data: successData, response: successResponse, error: nil, requestObserver: nil)
+        ])
+
+        let sut = APIClient(session: session, maxRetries: 2, retryDelay: 0)
+        let result = try await sut.getCharacters(page: 1)
+
+        XCTAssertEqual(result.results.count, 1)
+    }
+
+    func test_whenGetCharacters_failsAllAttempts_shouldThrowLastError() async {
+        var requestCount = 0
+        URLProtocolStub.startIntercepting(withSequence: [
+            .init(data: nil, response: nil, error: URLError(.networkConnectionLost), requestObserver: { _ in requestCount += 1 }),
+            .init(data: nil, response: nil, error: URLError(.networkConnectionLost), requestObserver: { _ in requestCount += 1 }),
+            .init(data: nil, response: nil, error: URLError(.networkConnectionLost), requestObserver: { _ in requestCount += 1 })
+        ])
+
+        let sut = APIClient(session: session, maxRetries: 3, retryDelay: 0)
+
+        do {
+            _ = try await sut.getCharacters(page: 1)
+            XCTFail("Expected error to be thrown")
+        } catch {
+            XCTAssertEqual(requestCount, 3)
+        }
+    }
+
+    func test_whenGetCharacters_succeedsOnFirstAttempt_shouldNotRetry() async throws {
+        var requestCount = 0
+        let successData = makeValidResponseData()
+        let successResponse = HTTPURLResponse(url: baseEndpoint!, statusCode: 200, httpVersion: nil, headerFields: nil)
+
+        URLProtocolStub.startIntercepting(withSequence: [
+            .init(data: successData, response: successResponse, error: nil, requestObserver: { _ in requestCount += 1 })
+        ])
+
+        let sut = APIClient(session: session, maxRetries: 3, retryDelay: 0)
+        _ = try await sut.getCharacters(page: 1)
+
+        XCTAssertEqual(requestCount, 1)
     }
 
     private func makeValidResponseData() -> Data {

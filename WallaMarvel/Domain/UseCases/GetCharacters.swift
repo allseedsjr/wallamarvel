@@ -1,7 +1,7 @@
 import Foundation
 
 protocol GetCharactersUseCaseProtocol {
-    func execute() async throws -> [Character]
+    func execute(page: Int) async throws -> CharactersPage
 }
 
 struct GetCharacters: GetCharactersUseCaseProtocol {
@@ -11,7 +11,7 @@ struct GetCharacters: GetCharactersUseCaseProtocol {
         self.repository = repository
     }
     
-    func execute() async throws -> [Character] {
-        try await repository.getCharacters()
+    func execute(page: Int) async throws -> CharactersPage {
+        try await repository.getCharacters(page: page)
     }
 }
