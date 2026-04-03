@@ -2,8 +2,19 @@ import Foundation
 import UIKit
 
 final class ListCharactersView: UIView {
-    enum Constant {
+    private enum Constants {
         static let estimatedRowHeight: CGFloat = 120
+        static let errorLabelHorizontalInset: CGFloat = 24
+        static let errorLabelVerticalOffset: CGFloat = -40
+        static let retryButtonTopSpacing: CGFloat = 24
+        static let retryButtonWidth: CGFloat = 120
+        static let retryButtonHeight: CGFloat = 44
+        static let retryButtonCornerRadius: CGFloat = 8
+        static let fontSize: CGFloat = 16
+    }
+
+    private enum Strings {
+        static let retry = "Retry"
     }
     
     private let charactersTableView: UITableView = {
@@ -11,7 +22,7 @@ final class ListCharactersView: UIView {
         tableView.register(ListCharactersTableViewCell.self, forCellReuseIdentifier: "ListCharactersTableViewCell")
         tableView.translatesAutoresizingMaskIntoConstraints = false
         tableView.rowHeight = UITableView.automaticDimension
-        tableView.estimatedRowHeight = Constant.estimatedRowHeight
+        tableView.estimatedRowHeight = Constants.estimatedRowHeight
         return tableView
     }()
     
@@ -42,7 +53,7 @@ final class ListCharactersView: UIView {
         label.translatesAutoresizingMaskIntoConstraints = false
         label.numberOfLines = 0
         label.textAlignment = .center
-        label.font = UIFont.systemFont(ofSize: 16, weight: .regular)
+        label.font = UIFont.systemFont(ofSize: Constants.fontSize, weight: .regular)
         label.textColor = .darkText
         return label
     }()
@@ -50,11 +61,11 @@ final class ListCharactersView: UIView {
     private let retryButton: UIButton = {
         let button = UIButton(type: .system)
         button.translatesAutoresizingMaskIntoConstraints = false
-        button.setTitle("Retry", for: .normal)
-        button.titleLabel?.font = UIFont.systemFont(ofSize: 16, weight: .semibold)
+        button.setTitle(Strings.retry, for: .normal)
+        button.titleLabel?.font = UIFont.systemFont(ofSize: Constants.fontSize, weight: .semibold)
         button.backgroundColor = .systemBlue
         button.setTitleColor(.white, for: .normal)
-        button.layer.cornerRadius = 8
+        button.layer.cornerRadius = Constants.retryButtonCornerRadius
         return button
     }()
     
@@ -102,14 +113,14 @@ final class ListCharactersView: UIView {
             errorContainerView.topAnchor.constraint(equalTo: topAnchor),
             errorContainerView.bottomAnchor.constraint(equalTo: bottomAnchor),
             
-            errorLabel.leadingAnchor.constraint(equalTo: errorContainerView.leadingAnchor, constant: 24),
-            errorLabel.trailingAnchor.constraint(equalTo: errorContainerView.trailingAnchor, constant: -24),
-            errorLabel.centerYAnchor.constraint(equalTo: errorContainerView.centerYAnchor, constant: -40),
+            errorLabel.leadingAnchor.constraint(equalTo: errorContainerView.leadingAnchor, constant: Constants.errorLabelHorizontalInset),
+            errorLabel.trailingAnchor.constraint(equalTo: errorContainerView.trailingAnchor, constant: -Constants.errorLabelHorizontalInset),
+            errorLabel.centerYAnchor.constraint(equalTo: errorContainerView.centerYAnchor, constant: Constants.errorLabelVerticalOffset),
             
-            retryButton.topAnchor.constraint(equalTo: errorLabel.bottomAnchor, constant: 24),
+            retryButton.topAnchor.constraint(equalTo: errorLabel.bottomAnchor, constant: Constants.retryButtonTopSpacing),
             retryButton.centerXAnchor.constraint(equalTo: errorContainerView.centerXAnchor),
-            retryButton.widthAnchor.constraint(equalToConstant: 120),
-            retryButton.heightAnchor.constraint(equalToConstant: 44),
+            retryButton.widthAnchor.constraint(equalToConstant: Constants.retryButtonWidth),
+            retryButton.heightAnchor.constraint(equalToConstant: Constants.retryButtonHeight),
         ])
     }
 

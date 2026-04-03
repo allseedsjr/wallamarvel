@@ -2,6 +2,38 @@ import UIKit
 import Kingfisher
 
 final class DetailCharacterViewController: UIViewController {
+
+    // MARK: - Constants
+
+    private enum Constants {
+        static let stackSpacing: CGFloat = 16
+        static let contentInset: CGFloat = 16
+        static let contentVerticalInset: CGFloat = 24
+        static let imageSize: CGFloat = 200
+        static let imageCornerRadius: CGFloat = 100
+        static let badgeFontSize: CGFloat = 14
+        static let badgeCornerRadius: CGFloat = 10
+        static let badgeHeight: CGFloat = 28
+        static let sectionFontSize: CGFloat = 17
+        static let rowFontSize: CGFloat = 15
+        static let rowSpacing: CGFloat = 8
+        static let imageFadeDuration: CGFloat = 0.2
+    }
+
+    private enum Strings {
+        static let firstSeenIn = "First seen in"
+        static let retry = "Retry"
+        static let statusAlive = "● Alive"
+        static let statusDead = "● Dead"
+        static let statusUnknown = "● Unknown"
+        static let rowSpecies = "Species"
+        static let rowType = "Type"
+        static let rowGender = "Gender"
+        static let rowOrigin = "Origin"
+        static let rowLocation = "Location"
+        static let rowEpisodes = "Episodes"
+    }
+
     private let character: Character
     var presenter: DetailCharacterPresenterProtocol?
 
@@ -11,8 +43,13 @@ final class DetailCharacterViewController: UIViewController {
     private let contentStack: UIStackView = {
         let stack = UIStackView()
         stack.axis = .vertical
-        stack.spacing = 16
-        stack.layoutMargins = UIEdgeInsets(top: 24, left: 16, bottom: 24, right: 16)
+        stack.spacing = Constants.stackSpacing
+        stack.layoutMargins = UIEdgeInsets(
+            top: Constants.contentVerticalInset,
+            left: Constants.contentInset,
+            bottom: Constants.contentVerticalInset,
+            right: Constants.contentInset
+        )
         stack.isLayoutMarginsRelativeArrangement = true
         return stack
     }()
@@ -21,16 +58,16 @@ final class DetailCharacterViewController: UIViewController {
         let iv = UIImageView()
         iv.contentMode = .scaleAspectFill
         iv.clipsToBounds = true
-        iv.layer.cornerRadius = 100
+        iv.layer.cornerRadius = Constants.imageCornerRadius
         iv.translatesAutoresizingMaskIntoConstraints = false
         return iv
     }()
 
     private let statusBadge: UILabel = {
         let label = UILabel()
-        label.font = .systemFont(ofSize: 14, weight: .semibold)
+        label.font = .systemFont(ofSize: Constants.badgeFontSize, weight: .semibold)
         label.textColor = .white
-        label.layer.cornerRadius = 10
+        label.layer.cornerRadius = Constants.badgeCornerRadius
         label.layer.masksToBounds = true
         label.textAlignment = .center
         label.translatesAutoresizingMaskIntoConstraints = false
@@ -39,8 +76,8 @@ final class DetailCharacterViewController: UIViewController {
 
     private let episodeSectionLabel: UILabel = {
         let label = UILabel()
-        label.text = "First seen in"
-        label.font = .systemFont(ofSize: 17, weight: .semibold)
+        label.text = Strings.firstSeenIn
+        label.font = .systemFont(ofSize: Constants.sectionFontSize, weight: .semibold)
         return label
     }()
 
@@ -53,7 +90,7 @@ final class DetailCharacterViewController: UIViewController {
     private let episodeInfoLabel: UILabel = {
         let label = UILabel()
         label.numberOfLines = 0
-        label.font = .systemFont(ofSize: 15)
+        label.font = .systemFont(ofSize: Constants.rowFontSize)
         label.isHidden = true
         return label
     }()
@@ -61,7 +98,7 @@ final class DetailCharacterViewController: UIViewController {
     private let episodeErrorLabel: UILabel = {
         let label = UILabel()
         label.numberOfLines = 0
-        label.font = .systemFont(ofSize: 15)
+        label.font = .systemFont(ofSize: Constants.rowFontSize)
         label.textColor = .systemRed
         label.isHidden = true
         return label
@@ -69,7 +106,7 @@ final class DetailCharacterViewController: UIViewController {
 
     private lazy var retryButton: UIButton = {
         let button = UIButton(type: .system)
-        button.setTitle("Retry", for: .normal)
+        button.setTitle(Strings.retry, for: .normal)
         button.addTarget(self, action: #selector(retryTapped), for: .touchUpInside)
         button.isHidden = true
         return button
@@ -135,13 +172,13 @@ final class DetailCharacterViewController: UIViewController {
             imageView.centerXAnchor.constraint(equalTo: container.centerXAnchor),
             imageView.topAnchor.constraint(equalTo: container.topAnchor),
             imageView.bottomAnchor.constraint(equalTo: container.bottomAnchor),
-            imageView.widthAnchor.constraint(equalToConstant: 200),
-            imageView.heightAnchor.constraint(equalToConstant: 200)
+            imageView.widthAnchor.constraint(equalToConstant: Constants.imageSize),
+            imageView.heightAnchor.constraint(equalToConstant: Constants.imageSize)
         ])
         contentStack.addArrangedSubview(container)
 
         if let url = URL(string: character.imageURL) {
-            imageView.kf.setImage(with: url, options: [.transition(.fade(0.2)), .cacheOriginalImage])
+            imageView.kf.setImage(with: url, options: [.transition(.fade(Constants.imageFadeDuration)), .cacheOriginalImage])
         }
     }
 
@@ -149,9 +186,9 @@ final class DetailCharacterViewController: UIViewController {
         let status = character.status.lowercased()
         let (text, color): (String, UIColor) = {
             switch status {
-            case "alive": return ("● Alive", .systemGreen)
-            case "dead":  return ("● Dead", .systemRed)
-            default:      return ("● Unknown", .systemGray)
+            case "alive": return (Strings.statusAlive, .systemGreen)
+            case "dead":  return (Strings.statusDead, .systemRed)
+            default:      return (Strings.statusUnknown, .systemGray)
             }
         }()
         statusBadge.text = "  \(text)  "
@@ -163,20 +200,20 @@ final class DetailCharacterViewController: UIViewController {
             statusBadge.centerXAnchor.constraint(equalTo: container.centerXAnchor),
             statusBadge.topAnchor.constraint(equalTo: container.topAnchor),
             statusBadge.bottomAnchor.constraint(equalTo: container.bottomAnchor),
-            statusBadge.heightAnchor.constraint(equalToConstant: 28)
+            statusBadge.heightAnchor.constraint(equalToConstant: Constants.badgeHeight)
         ])
         contentStack.addArrangedSubview(container)
     }
 
     private func addInfoRows() {
-        contentStack.addArrangedSubview(makeInfoRow(title: "Species", value: character.species))
+        contentStack.addArrangedSubview(makeInfoRow(title: Strings.rowSpecies, value: character.species))
         if !character.type.isEmpty {
-            contentStack.addArrangedSubview(makeInfoRow(title: "Type", value: character.type))
+            contentStack.addArrangedSubview(makeInfoRow(title: Strings.rowType, value: character.type))
         }
-        contentStack.addArrangedSubview(makeInfoRow(title: "Gender", value: character.gender))
-        contentStack.addArrangedSubview(makeInfoRow(title: "Origin", value: character.originName))
-        contentStack.addArrangedSubview(makeInfoRow(title: "Location", value: character.locationName))
-        contentStack.addArrangedSubview(makeInfoRow(title: "Episodes", value: "\(character.episodeCount)"))
+        contentStack.addArrangedSubview(makeInfoRow(title: Strings.rowGender, value: character.gender))
+        contentStack.addArrangedSubview(makeInfoRow(title: Strings.rowOrigin, value: character.originName))
+        contentStack.addArrangedSubview(makeInfoRow(title: Strings.rowLocation, value: character.locationName))
+        contentStack.addArrangedSubview(makeInfoRow(title: Strings.rowEpisodes, value: "\(character.episodeCount)"))
     }
 
     private func addEpisodeSection() {
@@ -190,17 +227,17 @@ final class DetailCharacterViewController: UIViewController {
     private func makeInfoRow(title: String, value: String) -> UIView {
         let row = UIStackView()
         row.axis = .horizontal
-        row.spacing = 8
+        row.spacing = Constants.rowSpacing
         row.distribution = .equalSpacing
 
         let titleLabel = UILabel()
         titleLabel.text = title
-        titleLabel.font = .systemFont(ofSize: 15, weight: .semibold)
+        titleLabel.font = .systemFont(ofSize: Constants.rowFontSize, weight: .semibold)
         titleLabel.setContentHuggingPriority(.defaultHigh, for: .horizontal)
 
         let valueLabel = UILabel()
         valueLabel.text = value
-        valueLabel.font = .systemFont(ofSize: 15)
+        valueLabel.font = .systemFont(ofSize: Constants.rowFontSize)
         valueLabel.textAlignment = .right
         valueLabel.numberOfLines = 0
 

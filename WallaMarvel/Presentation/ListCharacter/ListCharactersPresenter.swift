@@ -23,6 +23,10 @@ protocol ListCharactersUI: AnyObject {
 
 @MainActor
 final class ListCharactersPresenter: ListCharactersPresenterProtocol {
+    private enum Strings {
+        static let screenTitle = "List of Characters"
+    }
+
     var ui: ListCharactersUI?
     private let getCharactersUseCase: GetCharactersUseCaseProtocol
 
@@ -36,7 +40,7 @@ final class ListCharactersPresenter: ListCharactersPresenterProtocol {
     }
 
     func screenTitle() -> String {
-        "List of Characters"
+        Strings.screenTitle
     }
 
     func getCharacters() async {
