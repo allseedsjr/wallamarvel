@@ -13,7 +13,7 @@ final class CharacterDataSource: CharacterDataSourceProtocol {
     
     func getCharacters(page: Int) async throws -> CharacterDataContainer {
         do {
-            return try await apiClient.getCharacters(page: page)
+            return try await apiClient.request(GetCharactersRequest(page: page))
         } catch {
             throw AppErrorMapper.map(error)
         }
