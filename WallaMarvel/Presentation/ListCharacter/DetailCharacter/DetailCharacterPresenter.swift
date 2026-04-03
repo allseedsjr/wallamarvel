@@ -22,7 +22,7 @@ final class DetailCharacterPresenter: DetailCharacterPresenterProtocol {
 
     init(
         character: Character,
-        getFirstEpisodeUseCase: GetCharacterFirstEpisodeUseCaseProtocol = GetCharacterFirstEpisode()
+        getFirstEpisodeUseCase: GetCharacterFirstEpisodeUseCaseProtocol
     ) {
         self.character = character
         self.getFirstEpisodeUseCase = getFirstEpisodeUseCase

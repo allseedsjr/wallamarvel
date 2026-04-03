@@ -13,7 +13,11 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         self.window = window
 
         let navigationController = UINavigationController()
-        let presenter = ListCharactersPresenter()
+        let apiClient = APIClient()
+        let characterDataSource = CharacterDataSource(apiClient: apiClient)
+        let characterRepository = CharacterRepository(dataSource: characterDataSource)
+        let getCharactersUseCase = GetCharacters(repository: characterRepository)
+        let presenter = ListCharactersPresenter(getCharactersUseCase: getCharactersUseCase)
         let listViewController = ListCharactersViewController()
         let listCoordinator = ListCharactersCoordinator(
             navigationController: navigationController,

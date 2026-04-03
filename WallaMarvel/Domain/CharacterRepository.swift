@@ -7,7 +7,7 @@ protocol CharacterRepositoryProtocol {
 final class CharacterRepository: CharacterRepositoryProtocol {
     private let dataSource: CharacterDataSourceProtocol
     
-    init(dataSource: CharacterDataSourceProtocol = CharacterDataSource()) {
+    init(dataSource: CharacterDataSourceProtocol) {
         self.dataSource = dataSource
     }
     

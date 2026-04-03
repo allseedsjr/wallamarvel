@@ -32,7 +32,11 @@ final class ListCharactersCoordinator: NavigationCoordinator {
 extension ListCharactersCoordinator: ListCharactersCoordinatorProtocol {
     @MainActor
     func showDetail(for character: Character) {
-        let presenter = DetailCharacterPresenter(character: character)
+        let apiClient = APIClient()
+        let episodeDataSource = EpisodeDataSource(apiClient: apiClient)
+        let episodeRepository = EpisodeRepository(dataSource: episodeDataSource)
+        let getFirstEpisodeUseCase = GetCharacterFirstEpisode(repository: episodeRepository)
+        let presenter = DetailCharacterPresenter(character: character, getFirstEpisodeUseCase: getFirstEpisodeUseCase)
         let detailViewController = DetailCharacterViewController(character: character, presenter: presenter)
         presenter.ui = detailViewController
         let coordinator = DetailCharacterCoordinator(

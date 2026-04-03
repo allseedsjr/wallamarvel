@@ -31,7 +31,7 @@ final class ListCharactersPresenter: ListCharactersPresenterProtocol {
     private var isLoadingPage = false
     private var isPaginationBlocked = false
 
-    init(getCharactersUseCase: GetCharactersUseCaseProtocol = GetCharacters()) {
+    init(getCharactersUseCase: GetCharactersUseCaseProtocol) {
         self.getCharactersUseCase = getCharactersUseCase
     }
 

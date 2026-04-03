@@ -7,7 +7,7 @@ protocol EpisodeRepositoryProtocol {
 final class EpisodeRepository: EpisodeRepositoryProtocol {
     private let dataSource: EpisodeDataSourceProtocol
 
-    init(dataSource: EpisodeDataSourceProtocol = EpisodeDataSource()) {
+    init(dataSource: EpisodeDataSourceProtocol) {
         self.dataSource = dataSource
     }
 

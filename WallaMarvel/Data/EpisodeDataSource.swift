@@ -7,7 +7,7 @@ protocol EpisodeDataSourceProtocol {
 final class EpisodeDataSource: EpisodeDataSourceProtocol {
     private let apiClient: APIClientProtocol
 
-    init(apiClient: APIClientProtocol = APIClient()) {
+    init(apiClient: APIClientProtocol) {
         self.apiClient = apiClient
     }
 

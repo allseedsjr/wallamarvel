@@ -7,7 +7,7 @@ protocol GetCharacterFirstEpisodeUseCaseProtocol {
 struct GetCharacterFirstEpisode: GetCharacterFirstEpisodeUseCaseProtocol {
     private let repository: EpisodeRepositoryProtocol
 
-    init(repository: EpisodeRepositoryProtocol = EpisodeRepository()) {
+    init(repository: EpisodeRepositoryProtocol) {
         self.repository = repository
     }
 
