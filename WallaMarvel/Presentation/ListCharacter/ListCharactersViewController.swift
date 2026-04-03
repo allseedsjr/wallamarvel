@@ -1,13 +1,22 @@
 import UIKit
 
 final class ListCharactersViewController: UIViewController {
+    private enum Constants {
+        static let paginationThreshold = 5
+    }
+
+    private enum Strings {
+        static let paginationErrorTitle = "Error loading more"
+        static let retry = "Retry"
+        static let dismiss = "Dismiss"
+    }
     var mainView: ListCharactersView { return view as! ListCharactersView }
 
     var presenter: ListCharactersPresenterProtocol?
     var listCharactersProvider: ListCharactersAdapter?
     weak var coordinator: ListCharactersCoordinatorProtocol?
 
-    private let paginationThreshold = 5
+    private let paginationThreshold = Constants.paginationThreshold
     private var isPaginatingFromScroll = false
 
     override func loadView() {
@@ -60,14 +69,14 @@ extension ListCharactersViewController: ListCharactersUI {
 
     func showPaginationError(_ error: AppError) {
         let alert = UIAlertController(
-            title: "Error loading more",
+            title: Strings.paginationErrorTitle,
             message: error.userMessage,
             preferredStyle: .alert
         )
-        alert.addAction(UIAlertAction(title: "Retry", style: .default) { [weak self] _ in
+        alert.addAction(UIAlertAction(title: Strings.retry, style: .default) { [weak self] _ in
             Task { [weak self] in await self?.presenter?.retryNextPage() }
         })
-        alert.addAction(UIAlertAction(title: "Dismiss", style: .cancel))
+        alert.addAction(UIAlertAction(title: Strings.dismiss, style: .cancel))
         present(alert, animated: true)
     }
 

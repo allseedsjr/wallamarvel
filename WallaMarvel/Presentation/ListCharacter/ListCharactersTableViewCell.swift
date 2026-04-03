@@ -3,6 +3,11 @@ import UIKit
 import Kingfisher
 
 final class ListCharactersTableViewCell: UITableViewCell {
+    private enum Constants {
+        static let imageSize: CGFloat = 80
+        static let outerSpacing: CGFloat = 12
+        static let innerSpacing: CGFloat = 8
+    }
     private let characterImageView: UIImageView = {
         let imageView = UIImageView()
         imageView.translatesAutoresizingMaskIntoConstraints = false
@@ -37,14 +42,14 @@ final class ListCharactersTableViewCell: UITableViewCell {
     
     private func addContraints() {
         NSLayoutConstraint.activate([
-            characterImageView.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 12),
-            characterImageView.topAnchor.constraint(equalTo: topAnchor, constant: 12),
-            characterImageView.heightAnchor.constraint(equalToConstant: 80),
-            characterImageView.widthAnchor.constraint(equalToConstant: 80),
-            characterImageView.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -12),
+            characterImageView.leadingAnchor.constraint(equalTo: leadingAnchor, constant: Constants.outerSpacing),
+            characterImageView.topAnchor.constraint(equalTo: topAnchor, constant: Constants.outerSpacing),
+            characterImageView.heightAnchor.constraint(equalToConstant: Constants.imageSize),
+            characterImageView.widthAnchor.constraint(equalToConstant: Constants.imageSize),
+            characterImageView.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -Constants.outerSpacing),
             
-            characterName.leadingAnchor.constraint(equalTo: characterImageView.trailingAnchor, constant: 12),
-            characterName.topAnchor.constraint(equalTo: characterImageView.topAnchor, constant: 8),
+            characterName.leadingAnchor.constraint(equalTo: characterImageView.trailingAnchor, constant: Constants.outerSpacing),
+            characterName.topAnchor.constraint(equalTo: characterImageView.topAnchor, constant: Constants.innerSpacing),
         ])
     }
     
