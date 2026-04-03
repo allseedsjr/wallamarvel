@@ -32,7 +32,9 @@ final class ListCharactersCoordinator: NavigationCoordinator {
 extension ListCharactersCoordinator: ListCharactersCoordinatorProtocol {
     @MainActor
     func showDetail(for character: Character) {
-        let detailViewController = DetailCharacterViewController(character: character)
+        let presenter = DetailCharacterPresenter(character: character)
+        let detailViewController = DetailCharacterViewController(character: character, presenter: presenter)
+        presenter.ui = detailViewController
         let coordinator = DetailCharacterCoordinator(
             navigationController: navigationController,
             viewController: detailViewController

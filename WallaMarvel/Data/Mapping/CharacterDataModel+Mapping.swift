@@ -7,11 +7,13 @@ extension CharacterDataModel {
             name: name,
             status: status,
             species: species,
+            type: type,
             gender: gender,
             imageURL: image,
             originName: origin.name,
             locationName: location.name,
-            episodeCount: episode.count
+            episodeCount: episode.count,
+            firstEpisodeURL: episode.first
         )
     }
 }

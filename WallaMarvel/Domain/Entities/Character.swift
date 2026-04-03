@@ -9,22 +9,26 @@ struct Character: Equatable {
     let name: String
     let status: String
     let species: String
+    let type: String
     let gender: String
     let imageURL: String
     let originName: String
     let locationName: String
     let episodeCount: Int
-    
+    let firstEpisodeURL: String?
+
     init(
         id: Int,
         name: String,
         status: String,
         species: String,
+        type: String,
         gender: String,
         imageURL: String,
         originName: String,
         locationName: String,
-        episodeCount: Int
+        episodeCount: Int,
+        firstEpisodeURL: String? = nil
     ) throws {
         guard !imageURL.isEmpty,
               let url = URL(string: imageURL),
@@ -36,11 +40,13 @@ struct Character: Equatable {
         self.name = name
         self.status = status
         self.species = species
+        self.type = type
         self.gender = gender
         self.imageURL = imageURL
         self.originName = originName
         self.locationName = locationName
         self.episodeCount = episodeCount
+        self.firstEpisodeURL = firstEpisodeURL
     }
 }
 
