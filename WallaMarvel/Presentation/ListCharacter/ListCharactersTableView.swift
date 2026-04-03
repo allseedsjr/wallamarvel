@@ -66,6 +66,7 @@ final class ListCharactersView: UIView {
         button.backgroundColor = .systemBlue
         button.setTitleColor(.white, for: .normal)
         button.layer.cornerRadius = Constants.retryButtonCornerRadius
+        button.accessibilityHint = "Activates to reload the character list"
         return button
     }()
     
@@ -157,6 +158,7 @@ final class ListCharactersView: UIView {
         errorContainerView.isHidden = false
         bringSubviewToFront(errorContainerView)
         errorLabel.text = message
+        UIAccessibility.post(notification: .screenChanged, argument: errorLabel)
     }
 
     func setRetryEnabled(_ isEnabled: Bool) {
