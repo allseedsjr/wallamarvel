@@ -109,6 +109,7 @@ final class DetailCharacterViewController: UIViewController {
         button.setTitle(Strings.retry, for: .normal)
         button.addTarget(self, action: #selector(retryTapped), for: .touchUpInside)
         button.isHidden = true
+        button.accessibilityHint = "Activates to retry loading the episode"
         return button
     }()
 
@@ -288,6 +289,7 @@ extension DetailCharacterViewController: DetailCharacterUI {
         episodeErrorLabel.isHidden = false
         episodeInfoLabel.isHidden = true
         retryButton.isHidden = false
+        UIAccessibility.post(notification: .screenChanged, argument: episodeErrorLabel)
     }
 }
 
