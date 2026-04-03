@@ -6,8 +6,12 @@ protocol ListCharactersPresenterProtocol: AnyObject {
     func getCharacters() async
 }
 
+@MainActor
 protocol ListCharactersUI: AnyObject {
+    func showLoading()
+    func hideLoading()
     func update(characters: [Character])
+    func showError(_ error: AppError)
 }
 
 final class ListCharactersPresenter: ListCharactersPresenterProtocol {
@@ -22,16 +26,17 @@ final class ListCharactersPresenter: ListCharactersPresenterProtocol {
         "List of Characters"
     }
     
-    // MARK: UseCases
-    
     func getCharacters() async {
+        await ui?.showLoading()
+        
         do {
             let characters = try await getCharactersUseCase.execute()
-            await MainActor.run {
-                self.ui?.update(characters: characters)
-            }
+            await ui?.update(characters: characters)
+        } catch let error as AppError {
+            await ui?.showError(error)
         } catch {
-            print("Error fetching characters: \(error)")
+            let appError = AppErrorMapper.map(error)
+            await ui?.showError(appError)
         }
     }
 }

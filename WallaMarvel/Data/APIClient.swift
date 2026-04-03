@@ -15,10 +15,17 @@ final class APIClient: APIClientProtocol {
         let endpoint = "https://rickandmortyapi.com/api/character"
         
         guard let url = URL(string: endpoint) else {
-            throw NSError(domain: "Invalid URL", code: -1)
+            throw AppError.invalidData("Invalid API endpoint URL")
         }
         
-        let (data, _) = try await session.data(from: url)
+        let (data, response) = try await session.data(from: url)
+        
+        if let httpResponse = response as? HTTPURLResponse {
+            guard (200...299).contains(httpResponse.statusCode) else {
+                throw AppError.network("HTTP \(httpResponse.statusCode): Server error")
+            }
+        }
+        
         let dataModel = try JSONDecoder().decode(CharacterDataContainer.self, from: data)
         return dataModel
     }

@@ -30,4 +30,20 @@ final class CharacterDataSourceTests: XCTestCase {
             XCTAssertTrue(apiClientSpy.getCharactersCalled)
         }
     }
-}
+    
+    func test_whenGetCharacters_withAPIError_shouldMapToAppError() async {
+        let urlError = URLError(.notConnectedToInternet)
+        apiClientSpy.error = urlError
+
+        do {
+            _ = try await sut.getCharacters()
+            XCTFail("Expected AppError to be thrown")
+        } catch let error as AppError {
+            if case .network = error {
+            } else {
+                XCTFail("Expected network error, got \(error)")
+            }
+        } catch {
+            XCTFail("Expected AppError, got different error type")
+        }
+    }

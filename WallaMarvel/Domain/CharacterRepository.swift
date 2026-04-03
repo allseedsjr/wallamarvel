@@ -12,7 +12,13 @@ final class CharacterRepository: CharacterRepositoryProtocol {
     }
     
     func getCharacters() async throws -> [Character] {
-        let container = try await dataSource.getCharacters()
-        return try container.toDomainCharacters()
+        do {
+            let container = try await dataSource.getCharacters()
+            return try container.toDomainCharacters()
+        } catch let error as AppError {
+            throw error
+        } catch {
+            throw AppErrorMapper.map(error)
+        }
     }
 }

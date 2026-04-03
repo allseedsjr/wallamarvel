@@ -51,7 +51,11 @@
 		1AE537D32F7E0BE8008BABB4 /* Location+fixture.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1AE537D22F7E0BE8008BABB4 /* Location+fixture.swift */; };
 		1AE537D52F7E0BEC008BABB4 /* Thumbnail+fixture.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1AE537D42F7E0BEC008BABB4 /* Thumbnail+fixture.swift */; };
 		1AE537D72F7E0BFA008BABB4 /* CharacterDataModel+fixture.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1AE537D62F7E0BFA008BABB4 /* CharacterDataModel+fixture.swift */; };
+		6FF50D79AFADE4D4FA3E6F4A /* AppErrorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D28C8FF45D193ADF868F043 /* AppErrorTests.swift */; };
 		A66389F32DCE202500466318 /* Kingfisher in Frameworks */ = {isa = PBXBuildFile; productRef = A66389F22DCE202500466318 /* Kingfisher */; };
+		C0E34B0FEA5F574586DAEE37 /* AppErrorMapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 098896F8E8ADBCEA320C7B48 /* AppErrorMapper.swift */; };
+		F585F2C321223DDD15051939 /* AppError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DCD5856E0C7CEDDA14C48D5 /* AppError.swift */; };
+		F8958390974A92B22B51A0CE /* AppErrorMapperTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7331CFD7344EAA013BAF60E8 /* AppErrorMapperTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -72,6 +76,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		098896F8E8ADBCEA320C7B48 /* AppErrorMapper.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = AppErrorMapper.swift; path = WallaMarvel/Data/ErrorMapping/AppErrorMapper.swift; sourceTree = "<group>"; };
 		1A0E3A952862F7E200132FCB /* WallaMarvel.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = WallaMarvel.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		1A0E3A982862F7E200132FCB /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		1A0E3A9A2862F7E200132FCB /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -121,6 +126,9 @@
 		1AE537D22F7E0BE8008BABB4 /* Location+fixture.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Location+fixture.swift"; sourceTree = "<group>"; };
 		1AE537D42F7E0BEC008BABB4 /* Thumbnail+fixture.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Thumbnail+fixture.swift"; sourceTree = "<group>"; };
 		1AE537D62F7E0BFA008BABB4 /* CharacterDataModel+fixture.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CharacterDataModel+fixture.swift"; sourceTree = "<group>"; };
+		1DCD5856E0C7CEDDA14C48D5 /* AppError.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = AppError.swift; path = WallaMarvel/Domain/Errors/AppError.swift; sourceTree = "<group>"; };
+		7331CFD7344EAA013BAF60E8 /* AppErrorMapperTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = AppErrorMapperTests.swift; sourceTree = "<group>"; };
+		9D28C8FF45D193ADF868F043 /* AppErrorTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = AppErrorTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -156,6 +164,8 @@
 				1A0E3AAE2862F7E300132FCB /* WallaMarvelTests */,
 				1A0E3AB82862F7E300132FCB /* WallaMarvelUITests */,
 				1A0E3A962862F7E200132FCB /* Products */,
+				A6E019FA656C27733E0A999D /* Domain */,
+				41AFB9F4A3B9E57DF53A303D /* Data */,
 			);
 			sourceTree = "<group>";
 		};
@@ -283,6 +293,7 @@
 			children = (
 				1AA67B842F7E1400002C7F2E /* UseCases */,
 				1AA67B952F7E152C002C7F2E /* CharacterRepositoryTests.swift */,
+				9D28C8FF45D193ADF868F043 /* AppErrorTests.swift */,
 			);
 			path = Domain;
 			sourceTree = "<group>";
@@ -310,6 +321,7 @@
 				1AA67B912F7E151B002C7F2E /* APIClientTests.swift */,
 				1AA67B9F2F7E1F82002C7F2E /* CharacterDataModelMappingTests.swift */,
 				1AA67B932F7E1525002C7F2E /* CharacterDataSourceTests.swift */,
+				7331CFD7344EAA013BAF60E8 /* AppErrorMapperTests.swift */,
 			);
 			path = Data;
 			sourceTree = "<group>";
@@ -370,6 +382,38 @@
 				1AA67B9D2F7E1EDA002C7F2E /* Character+fixture.swift */,
 			);
 			path = Fixtures;
+			sourceTree = "<group>";
+		};
+		2F237B39EFA072E22617230A /* Errors */ = {
+			isa = PBXGroup;
+			children = (
+				1DCD5856E0C7CEDDA14C48D5 /* AppError.swift */,
+			);
+			name = Errors;
+			sourceTree = "<group>";
+		};
+		360E950CD5EEA36D950549EF /* ErrorMapping */ = {
+			isa = PBXGroup;
+			children = (
+				098896F8E8ADBCEA320C7B48 /* AppErrorMapper.swift */,
+			);
+			name = ErrorMapping;
+			sourceTree = "<group>";
+		};
+		41AFB9F4A3B9E57DF53A303D /* Data */ = {
+			isa = PBXGroup;
+			children = (
+				360E950CD5EEA36D950549EF /* ErrorMapping */,
+			);
+			name = Data;
+			sourceTree = "<group>";
+		};
+		A6E019FA656C27733E0A999D /* Domain */ = {
+			isa = PBXGroup;
+			children = (
+				2F237B39EFA072E22617230A /* Errors */,
+			);
+			name = Domain;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -525,6 +569,8 @@
 				1A821EC92862FE3C0024D397 /* APIClient.swift in Sources */,
 				1AE537BE2F7E0474008BABB4 /* Origin.swift in Sources */,
 				1AA67B992F7E1EA6002C7F2E /* Character.swift in Sources */,
+				F585F2C321223DDD15051939 /* AppError.swift in Sources */,
+				C0E34B0FEA5F574586DAEE37 /* AppErrorMapper.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -552,6 +598,8 @@
 				1AE537D12F7E0BE5008BABB4 /* Origin+fixture.swift in Sources */,
 				1AE537D52F7E0BEC008BABB4 /* Thumbnail+fixture.swift in Sources */,
 				1AE537D32F7E0BE8008BABB4 /* Location+fixture.swift in Sources */,
+				F8958390974A92B22B51A0CE /* AppErrorMapperTests.swift in Sources */,
+				6FF50D79AFADE4D4FA3E6F4A /* AppErrorTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
