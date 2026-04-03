@@ -1,17 +1,16 @@
 @testable import WallaMarvel
 
 final class APIClientSpy: APIClientProtocol {
-    private(set) var getCharactersCalled: Bool = false
-    private(set) var lastRequestedPage: Int = 0
-    var result: CharacterDataContainer = .fixture()
+    private(set) var requestCalled = false
+    private(set) var lastRequest: (any APIRequest)?
+    var resultProvider: ((any APIRequest) throws -> Any)?
     var error: Error?
 
-    func getCharacters(page: Int) async throws -> CharacterDataContainer {
-        getCharactersCalled = true
-        lastRequestedPage = page
-        if let error {
-            throw error
-        }
-        return result
+    func request<T: Decodable>(_ request: any APIRequest) async throws -> T {
+        requestCalled = true
+        lastRequest = request
+        if let error { throw error }
+        if let result = try resultProvider?(request) as? T { return result }
+        throw TestError.any
     }
 }

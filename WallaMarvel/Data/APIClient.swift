@@ -1,7 +1,7 @@
 import Foundation
 
 protocol APIClientProtocol {
-    func getCharacters(page: Int) async throws -> CharacterDataContainer
+    func request<T: Decodable>(_ request: any APIRequest) async throws -> T
 }
 
 final class APIClient: APIClientProtocol {
@@ -19,14 +19,8 @@ final class APIClient: APIClientProtocol {
         self.retryDelay = retryDelay
     }
 
-    func getCharacters(page: Int) async throws -> CharacterDataContainer {
-        var components = URLComponents(string: "https://rickandmortyapi.com/api/character")
-        components?.queryItems = [URLQueryItem(name: "page", value: String(page))]
-
-        guard let url = components?.url else {
-            throw AppError.invalidData("Invalid API endpoint URL")
-        }
-
+    func request<T: Decodable>(_ request: any APIRequest) async throws -> T {
+        let url = try request.makeURL()
         var lastError: Error?
         for attempt in 1...maxRetries {
             do {
@@ -38,7 +32,7 @@ final class APIClient: APIClientProtocol {
                     }
                 }
 
-                return try JSONDecoder().decode(CharacterDataContainer.self, from: data)
+                return try JSONDecoder().decode(T.self, from: data)
             } catch {
                 lastError = error
                 if attempt < maxRetries {
@@ -47,6 +41,9 @@ final class APIClient: APIClientProtocol {
             }
         }
 
-        throw lastError!
+        guard let lastError else {
+            throw AppError.unknown("Request failed with no recorded error")
+        }
+        throw lastError
     }
 }
