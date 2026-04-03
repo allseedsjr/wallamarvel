@@ -31,4 +31,39 @@ final class CharacterRepositoryTests: XCTestCase {
             XCTAssertTrue(dataSourceSpy.getCharactersCalled)
         }
     }
+    
+    func test_whenGetCharacters_withDataSourceError_shouldThrowAppError() async {
+        let appError = AppError.network("Connection failed")
+        dataSourceSpy.error = appError
+
+        do {
+            _ = try await sut.getCharacters()
+            XCTFail("Expected AppError to be thrown")
+        } catch let error as AppError {
+            XCTAssertEqual(error, appError)
+        } catch {
+            XCTFail("Expected AppError, got different error type")
+        }
+    }
+    
+    func test_whenGetCharacters_withMappingError_shouldThrowAppError() async {
+        dataSourceSpy.result = CharacterDataContainer(
+            results: [
+                CharacterDataModel.fixture(image: "")
+            ],
+            info: PageInfo.fixture()
+        )
+
+        do {
+            _ = try await sut.getCharacters()
+            XCTFail("Expected AppError to be thrown")
+        } catch let error as AppError {
+            if case .invalidData = error {
+            } else {
+                XCTFail("Expected invalidData error, got \(error)")
+            }
+        } catch {
+            XCTFail("Expected AppError, got different error type")
+        }
+    }
 }

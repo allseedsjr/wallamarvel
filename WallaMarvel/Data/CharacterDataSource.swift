@@ -12,6 +12,10 @@ final class CharacterDataSource: CharacterDataSourceProtocol {
     }
     
     func getCharacters() async throws -> CharacterDataContainer {
-        try await apiClient.getCharacters()
+        do {
+            return try await apiClient.getCharacters()
+        } catch {
+            throw AppErrorMapper.map(error)
+        }
     }
 }

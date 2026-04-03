@@ -12,21 +12,43 @@ final class ListCharactersViewController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        listCharactersProvider = ListCharactersAdapter(tableView: mainView.charactersTableView)
+        listCharactersProvider = mainView.configureTableView(delegate: self)
         presenter?.ui = self
         Task { [weak self] in
             await self?.presenter?.getCharacters()
         }
         
         title = presenter?.screenTitle()
-        
-        mainView.charactersTableView.delegate = self
     }
 }
 
 extension ListCharactersViewController: ListCharactersUI {
+    func showLoading() {
+        mainView.showLoading()
+    }
+    
+    func hideLoading() {
+        mainView.hideLoading()
+    }
+    
     func update(characters: [Character]) {
+        mainView.showCharacters()
         listCharactersProvider?.characters = characters
+    }
+    
+    func showError(_ error: AppError) {
+        mainView.showError(message: error.userMessage)
+        mainView.setRetryEnabled(true)
+        mainView.setRetryTarget(self, action: #selector(handleRetryTap))
+    }
+    
+    @objc
+    private func handleRetryTap() {
+        mainView.setRetryEnabled(false)
+        showLoading()
+        Task { [weak self] in
+            await self?.presenter?.getCharacters()
+        }
     }
 }
 
