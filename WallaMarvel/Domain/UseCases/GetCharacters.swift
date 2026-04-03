@@ -7,7 +7,7 @@ protocol GetCharactersUseCaseProtocol {
 struct GetCharacters: GetCharactersUseCaseProtocol {
     private let repository: CharacterRepositoryProtocol
     
-    init(repository: CharacterRepositoryProtocol = CharacterRepository()) {
+    init(repository: CharacterRepositoryProtocol) {
         self.repository = repository
     }
     

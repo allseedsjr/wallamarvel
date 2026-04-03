@@ -7,7 +7,7 @@ protocol CharacterDataSourceProtocol {
 final class CharacterDataSource: CharacterDataSourceProtocol {
     private let apiClient: APIClientProtocol
     
-    init(apiClient: APIClientProtocol = APIClient()) {
+    init(apiClient: APIClientProtocol) {
         self.apiClient = apiClient
     }
     
