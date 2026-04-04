@@ -11,10 +11,15 @@ final class ListCharactersView: UIView {
         static let retryButtonHeight: CGFloat = 44
         static let retryButtonCornerRadius: CGFloat = 8
         static let fontSize: CGFloat = 16
+        static let emptySearchIconSize: CGFloat = 60
+        static let emptySearchSpacing: CGFloat = 16
+        static let emptySearchHorizontalInset: CGFloat = 32
     }
 
     private enum Strings {
         static let retry = "Retry"
+        static let emptySearchTitle = "No characters found"
+        static let emptySearchMessage = "Try a different name."
     }
     
     private let charactersTableView: UITableView = {
@@ -46,6 +51,47 @@ final class ListCharactersView: UIView {
         view.backgroundColor = .systemBackground
         view.isHidden = true
         return view
+    }()
+
+    private let emptySearchContainerView: UIView = {
+        let view = UIView()
+        view.translatesAutoresizingMaskIntoConstraints = false
+        view.backgroundColor = .systemBackground
+        view.isHidden = true
+        view.accessibilityElements = []
+        return view
+    }()
+
+    private let emptySearchIconView: UIImageView = {
+        let image = UIImageView(image: UIImage(systemName: "magnifyingglass"))
+        image.translatesAutoresizingMaskIntoConstraints = false
+        image.tintColor = .secondaryLabel
+        image.contentMode = .scaleAspectFit
+        image.isAccessibilityElement = false
+        return image
+    }()
+
+    private let emptySearchTitleLabel: UILabel = {
+        let label = UILabel()
+        label.translatesAutoresizingMaskIntoConstraints = false
+        label.text = Strings.emptySearchTitle
+        label.font = UIFont.systemFont(ofSize: 18, weight: .semibold)
+        label.textAlignment = .center
+        label.textColor = .label
+        label.isAccessibilityElement = false
+        return label
+    }()
+
+    private let emptySearchMessageLabel: UILabel = {
+        let label = UILabel()
+        label.translatesAutoresizingMaskIntoConstraints = false
+        label.text = Strings.emptySearchMessage
+        label.font = UIFont.systemFont(ofSize: 15)
+        label.textAlignment = .center
+        label.textColor = .secondaryLabel
+        label.numberOfLines = 0
+        label.isAccessibilityElement = false
+        return label
     }()
     
     private let errorLabel: UILabel = {
@@ -87,11 +133,15 @@ final class ListCharactersView: UIView {
     private func addSubviews() {
         addSubview(charactersTableView)
         addSubview(errorContainerView)
+        addSubview(emptySearchContainerView)
         addSubview(loadingView)
-        
+
         loadingView.addSubview(loadingIndicator)
         errorContainerView.addSubview(errorLabel)
         errorContainerView.addSubview(retryButton)
+        emptySearchContainerView.addSubview(emptySearchIconView)
+        emptySearchContainerView.addSubview(emptySearchTitleLabel)
+        emptySearchContainerView.addSubview(emptySearchMessageLabel)
     }
     
     private func addContraints() {
@@ -122,6 +172,24 @@ final class ListCharactersView: UIView {
             retryButton.centerXAnchor.constraint(equalTo: errorContainerView.centerXAnchor),
             retryButton.widthAnchor.constraint(equalToConstant: Constants.retryButtonWidth),
             retryButton.heightAnchor.constraint(equalToConstant: Constants.retryButtonHeight),
+
+            emptySearchContainerView.leadingAnchor.constraint(equalTo: leadingAnchor),
+            emptySearchContainerView.trailingAnchor.constraint(equalTo: trailingAnchor),
+            emptySearchContainerView.topAnchor.constraint(equalTo: topAnchor),
+            emptySearchContainerView.bottomAnchor.constraint(equalTo: bottomAnchor),
+
+            emptySearchIconView.centerXAnchor.constraint(equalTo: emptySearchContainerView.centerXAnchor),
+            emptySearchIconView.centerYAnchor.constraint(equalTo: emptySearchContainerView.centerYAnchor, constant: -Constants.emptySearchSpacing * 2),
+            emptySearchIconView.widthAnchor.constraint(equalToConstant: Constants.emptySearchIconSize),
+            emptySearchIconView.heightAnchor.constraint(equalToConstant: Constants.emptySearchIconSize),
+
+            emptySearchTitleLabel.topAnchor.constraint(equalTo: emptySearchIconView.bottomAnchor, constant: Constants.emptySearchSpacing),
+            emptySearchTitleLabel.leadingAnchor.constraint(equalTo: emptySearchContainerView.leadingAnchor, constant: Constants.emptySearchHorizontalInset),
+            emptySearchTitleLabel.trailingAnchor.constraint(equalTo: emptySearchContainerView.trailingAnchor, constant: -Constants.emptySearchHorizontalInset),
+
+            emptySearchMessageLabel.topAnchor.constraint(equalTo: emptySearchTitleLabel.bottomAnchor, constant: Constants.emptySearchSpacing / 2),
+            emptySearchMessageLabel.leadingAnchor.constraint(equalTo: emptySearchContainerView.leadingAnchor, constant: Constants.emptySearchHorizontalInset),
+            emptySearchMessageLabel.trailingAnchor.constraint(equalTo: emptySearchContainerView.trailingAnchor, constant: -Constants.emptySearchHorizontalInset),
         ])
     }
 
@@ -132,6 +200,7 @@ final class ListCharactersView: UIView {
 
     func showLoading() {
         errorContainerView.isHidden = true
+        emptySearchContainerView.isHidden = true
         charactersTableView.isHidden = true
         loadingView.isHidden = false
         bringSubviewToFront(loadingView)
@@ -145,10 +214,20 @@ final class ListCharactersView: UIView {
 
     func showCharacters() {
         errorContainerView.isHidden = true
+        emptySearchContainerView.isHidden = true
         loadingIndicator.stopAnimating()
         loadingView.isHidden = true
         charactersTableView.isHidden = false
         bringSubviewToFront(charactersTableView)
+    }
+
+    func showEmptySearch() {
+        charactersTableView.isHidden = true
+        emptySearchContainerView.isHidden = false
+        bringSubviewToFront(emptySearchContainerView)
+        emptySearchContainerView.isAccessibilityElement = true
+        emptySearchContainerView.accessibilityLabel = "\(Strings.emptySearchTitle). \(Strings.emptySearchMessage)"
+        UIAccessibility.post(notification: .screenChanged, argument: emptySearchContainerView)
     }
 
     func showError(message: String) {

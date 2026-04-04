@@ -3,6 +3,7 @@ import XCTest
 
 final class ListCharactersUISpy: ListCharactersUI {
     private(set) var updatedCharactersCount: Int?
+    private(set) var updatedCharacters: [Character] = []
     private(set) var appendedCharacters: [Character] = []
     private(set) var lastShownError: AppError?
     private(set) var lastPaginationError: AppError?
@@ -11,6 +12,7 @@ final class ListCharactersUISpy: ListCharactersUI {
     private(set) var hideLoadingWasCalled: Bool = false
     private(set) var isPaginationLoadingShown: Bool = false
     private(set) var showPaginationLoadingWasCalled: Bool = false
+    private(set) var showEmptySearchWasCalled: Bool = false
     private let updateExpectation: XCTestExpectation?
 
     init(updateExpectation: XCTestExpectation? = nil) {
@@ -28,6 +30,7 @@ final class ListCharactersUISpy: ListCharactersUI {
     }
 
     func update(characters: [Character]) {
+        updatedCharacters = characters
         updatedCharactersCount = characters.count
         updateExpectation?.fulfill()
     }
@@ -51,5 +54,9 @@ final class ListCharactersUISpy: ListCharactersUI {
 
     func showPaginationError(_ error: AppError) {
         lastPaginationError = error
+    }
+
+    func showEmptySearch() {
+        showEmptySearchWasCalled = true
     }
 }

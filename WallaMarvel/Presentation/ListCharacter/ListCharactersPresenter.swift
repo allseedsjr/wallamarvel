@@ -7,6 +7,8 @@ protocol ListCharactersPresenterProtocol: AnyObject {
     func getCharacters() async
     func loadNextPage() async
     func retryNextPage() async
+    func searchCharacters(name: String)
+    func clearSearch()
 }
 
 @MainActor
@@ -19,6 +21,7 @@ protocol ListCharactersUI: AnyObject {
     func hidePaginationLoading()
     func showError(_ error: AppError)
     func showPaginationError(_ error: AppError)
+    func showEmptySearch()
 }
 
 @MainActor
@@ -34,6 +37,8 @@ final class ListCharactersPresenter: ListCharactersPresenterProtocol {
     private var hasNextPage = false
     private var isLoadingPage = false
     private var isPaginationBlocked = false
+    private var allCharacters: [Character] = []
+    private var isSearchActive = false
 
     init(getCharactersUseCase: GetCharactersUseCaseProtocol) {
         self.getCharactersUseCase = getCharactersUseCase
@@ -49,12 +54,15 @@ final class ListCharactersPresenter: ListCharactersPresenterProtocol {
         hasNextPage = false
         isLoadingPage = false
         isPaginationBlocked = false
+        isSearchActive = false
+        allCharacters = []
 
         do {
             let page = try await getCharactersUseCase.execute(page: currentPage)
             hasNextPage = page.hasNextPage
+            allCharacters = page.characters
             ui?.hideLoading()
-            ui?.update(characters: page.characters)
+            ui?.update(characters: allCharacters)
         } catch let error as AppError {
             ui?.hideLoading()
             ui?.showError(error)
@@ -65,7 +73,7 @@ final class ListCharactersPresenter: ListCharactersPresenterProtocol {
     }
 
     func loadNextPage() async {
-        guard !isLoadingPage, hasNextPage, !isPaginationBlocked else { return }
+        guard !isLoadingPage, hasNextPage, !isPaginationBlocked, !isSearchActive else { return }
 
         isLoadingPage = true
         ui?.showPaginationLoading()
@@ -74,6 +82,7 @@ final class ListCharactersPresenter: ListCharactersPresenterProtocol {
             let page = try await getCharactersUseCase.execute(page: currentPage + 1)
             currentPage += 1
             hasNextPage = page.hasNextPage
+            allCharacters.append(contentsOf: page.characters)
             ui?.appendCharacters(page.characters)
         } catch let error as AppError {
             isPaginationBlocked = true
@@ -90,5 +99,27 @@ final class ListCharactersPresenter: ListCharactersPresenterProtocol {
     func retryNextPage() async {
         isPaginationBlocked = false
         await loadNextPage()
+    }
+
+    func searchCharacters(name: String) {
+        let query = name.trimmingCharacters(in: .whitespaces)
+        guard !query.isEmpty else {
+            clearSearch()
+            return
+        }
+        isSearchActive = true
+        let filtered = allCharacters.filter {
+            $0.name.localizedCaseInsensitiveContains(query)
+        }
+        if filtered.isEmpty {
+            ui?.showEmptySearch()
+        } else {
+            ui?.update(characters: filtered)
+        }
+    }
+
+    func clearSearch() {
+        isSearchActive = false
+        ui?.update(characters: allCharacters)
     }
 }
