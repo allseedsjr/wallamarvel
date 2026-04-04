@@ -247,6 +247,9 @@ The detail screen hero image height is defined as a single `Constants.imageHeigh
 ### `CharacterCellViewModel` — Presenter-owned mapping, dumb View
 Status color and text resolution (`"alive" → .systemGreen / "Alive"`) belongs to the Presenter, not the View. The View has no branch logic — it only applies values. `CharacterCellViewModel` makes the boundary explicit: the Presenter maps Domain types to UI-ready values; the cell assigns them without decisions. This also keeps `UIColor` out of the Domain layer while keeping the mapping testable at the Presenter level.
 
+### `ViewCode` protocol — uniform layout structure across all views
+All `UIView` subclasses in the Presentation layer conform to `ViewCode`, a lightweight protocol that enforces a consistent three-step setup sequence: `setupComponent()` (add subviews to the hierarchy), `setupConstrain()` (activate Auto Layout constraints), `setupExtraConfiguration()` (background colors, accessibility properties, `selectionStyle`, etc.). The default `setup()` implementation in the protocol extension calls the three steps in the correct order, so conforming types never call them out of order or forget a step. The impact is structural: any developer opening `ListCharactersView` or `ListCharactersTableViewCell` immediately knows where to find subview additions, where to find constraint activation, and where to find visual configuration — without reading the whole file.
+
 ## Test Coverage
 Patterns used:
 - **Spy** — verifies behavior (calls, parameters)

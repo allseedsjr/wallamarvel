@@ -2,7 +2,7 @@ import Foundation
 import UIKit
 import Kingfisher
 
-final class ListCharactersTableViewCell: UITableViewCell {
+final class ListCharactersTableViewCell: UITableViewCell, ViewCode {
 
     private enum Colors {
         static let card = UIColor(red: 11/255.0, green: 17/255.0, blue: 32/255.0, alpha: 1)
@@ -117,18 +117,18 @@ final class ListCharactersTableViewCell: UITableViewCell {
         fatalError("init(coder:) has not been implemented")
     }
 
-    // MARK: - Setup
+    // MARK: - ViewCode
 
-    private func setup() {
+    func setupComponent() {
+        contentView.addSubview(cardView)
+        cardView.addSubview(characterImageView)
+        cardView.addSubview(infoStack)
+    }
+
+    func setupExtraConfiguration() {
         backgroundColor = .clear
         contentView.backgroundColor = .clear
         selectionStyle = .none
-        addSubviews()
-        addConstraints()
-        setupAccessibility()
-    }
-
-    private func setupAccessibility() {
         isAccessibilityElement = true
         accessibilityHint = Strings.accessibilityHint
         characterImageView.isAccessibilityElement = false
@@ -137,13 +137,23 @@ final class ListCharactersTableViewCell: UITableViewCell {
         speciesLabel.isAccessibilityElement = false
     }
 
-    private func addSubviews() {
-        contentView.addSubview(cardView)
-        cardView.addSubview(characterImageView)
-        cardView.addSubview(infoStack)
-    }
+    // MARK: - Configure
 
-    private func addConstraints() {
+    func configure(viewModel: CharacterCellViewModel) {
+        let placeholder = UIImage(systemName: Strings.placeholderImage)
+        characterImageView.kf.setImage(with: viewModel.imageURL, placeholder: placeholder)
+        nameLabel.text = viewModel.name
+        speciesLabel.text = viewModel.species
+        statusDot.backgroundColor = viewModel.statusColor
+        statusLabel.text = viewModel.statusText
+        accessibilityLabel = "Character: \(viewModel.name). Status: \(viewModel.statusText). \(viewModel.species)."
+    }
+}
+
+// MARK: - ViewCode
+
+extension ListCharactersTableViewCell {
+    func setupConstrain() {
         NSLayoutConstraint.activate([
             cardView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: Constants.cardHorizontalInset),
             cardView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -Constants.cardHorizontalInset),
@@ -165,18 +175,6 @@ final class ListCharactersTableViewCell: UITableViewCell {
             infoStack.topAnchor.constraint(greaterThanOrEqualTo: cardView.topAnchor, constant: Constants.contentPadding),
             infoStack.bottomAnchor.constraint(lessThanOrEqualTo: cardView.bottomAnchor, constant: -Constants.contentPadding),
         ])
-    }
-
-    // MARK: - Configure
-
-    func configure(viewModel: CharacterCellViewModel) {
-        let placeholder = UIImage(systemName: Strings.placeholderImage)
-        characterImageView.kf.setImage(with: viewModel.imageURL, placeholder: placeholder)
-        nameLabel.text = viewModel.name
-        speciesLabel.text = viewModel.species
-        statusDot.backgroundColor = viewModel.statusColor
-        statusLabel.text = viewModel.statusText
-        accessibilityLabel = "Character: \(viewModel.name). Status: \(viewModel.statusText). \(viewModel.species)."
     }
 }
 
