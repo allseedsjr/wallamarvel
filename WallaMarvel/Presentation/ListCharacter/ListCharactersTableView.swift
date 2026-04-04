@@ -20,6 +20,10 @@ final class ListCharactersView: UIView {
         static let emptySearchTitle = "No characters found"
         static let emptySearchMessage = "Try a different name."
     }
+
+    private enum Colors {
+        static let background = UIColor(red: 6/255.0, green: 8/255.0, blue: 15/255.0, alpha: 1)
+    }
     
     private let charactersTableView: UITableView = {
         let tableView = UITableView()
@@ -27,19 +31,22 @@ final class ListCharactersView: UIView {
         tableView.translatesAutoresizingMaskIntoConstraints = false
         tableView.rowHeight = UITableView.automaticDimension
         tableView.estimatedRowHeight = Constants.estimatedRowHeight
+        tableView.separatorStyle = .none
+        tableView.backgroundColor = Colors.background
         return tableView
     }()
     
     private let loadingView: UIView = {
         let view = UIView()
         view.translatesAutoresizingMaskIntoConstraints = false
-        view.backgroundColor = .systemBackground
+        view.backgroundColor = Colors.background
         return view
     }()
     
     private let loadingIndicator: UIActivityIndicatorView = {
         let indicator = UIActivityIndicatorView(style: .large)
         indicator.translatesAutoresizingMaskIntoConstraints = false
+        indicator.color = .white
         indicator.startAnimating()
         return indicator
     }()
@@ -47,7 +54,7 @@ final class ListCharactersView: UIView {
     private let errorContainerView: UIView = {
         let view = UIView()
         view.translatesAutoresizingMaskIntoConstraints = false
-        view.backgroundColor = .systemBackground
+        view.backgroundColor = Colors.background
         view.isHidden = true
         return view
     }()
@@ -55,7 +62,7 @@ final class ListCharactersView: UIView {
     private let emptySearchContainerView: UIView = {
         let view = UIView()
         view.translatesAutoresizingMaskIntoConstraints = false
-        view.backgroundColor = .systemBackground
+        view.backgroundColor = Colors.background
         view.isHidden = true
         view.accessibilityElements = []
         return view
@@ -64,7 +71,7 @@ final class ListCharactersView: UIView {
     private let emptySearchIconView: UIImageView = {
         let image = UIImageView(image: UIImage(systemName: "magnifyingglass"))
         image.translatesAutoresizingMaskIntoConstraints = false
-        image.tintColor = .secondaryLabel
+        image.tintColor = .lightGray
         image.contentMode = .scaleAspectFit
         image.isAccessibilityElement = false
         return image
@@ -77,7 +84,7 @@ final class ListCharactersView: UIView {
         label.font = UIFont.adaptive(textStyle: .headline)
         label.adjustsFontForContentSizeCategory = true
         label.textAlignment = .center
-        label.textColor = .label
+        label.textColor = .white
         label.isAccessibilityElement = false
         return label
     }()
@@ -89,7 +96,7 @@ final class ListCharactersView: UIView {
         label.font = UIFont.adaptive(textStyle: .subheadline)
         label.adjustsFontForContentSizeCategory = true
         label.textAlignment = .center
-        label.textColor = .secondaryLabel
+        label.textColor = .lightGray
         label.numberOfLines = 0
         label.isAccessibilityElement = false
         return label
@@ -102,7 +109,7 @@ final class ListCharactersView: UIView {
         label.textAlignment = .center
         label.font = UIFont.adaptive(textStyle: .body)
         label.adjustsFontForContentSizeCategory = true
-        label.textColor = .darkText
+        label.textColor = .white
         return label
     }()
     
@@ -129,6 +136,7 @@ final class ListCharactersView: UIView {
     }
     
     private func setup() {
+        backgroundColor = Colors.background
         addSubviews()
         addContraints()
     }

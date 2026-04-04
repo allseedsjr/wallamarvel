@@ -332,4 +332,163 @@ final class ListCharactersPresenterTests: XCTestCase {
 
         XCTAssertFalse(getCharactersUseCaseSpy.executeCalled)
     }
+
+    // MARK: - ViewModel mapping
+
+    func test_whenGetCharacters_withAliveStatus_shouldMapStatusTextAndColorCorrectly() async {
+        getCharactersUseCaseSpy.pageResult = CharactersPage(
+            characters: [.fixture(status: "Alive")],
+            hasNextPage: false
+        )
+        let uiSpy = ListCharactersUISpy()
+        sut.ui = uiSpy
+
+        await sut.getCharacters()
+
+        XCTAssertEqual(uiSpy.updatedCharacters.first?.statusText, "Alive")
+        XCTAssertEqual(uiSpy.updatedCharacters.first?.statusColor, .systemGreen)
+    }
+
+    func test_whenGetCharacters_withDeadStatus_shouldMapStatusTextAndColorCorrectly() async {
+        getCharactersUseCaseSpy.pageResult = CharactersPage(
+            characters: [.fixture(status: "dead")],
+            hasNextPage: false
+        )
+        let uiSpy = ListCharactersUISpy()
+        sut.ui = uiSpy
+
+        await sut.getCharacters()
+
+        XCTAssertEqual(uiSpy.updatedCharacters.first?.statusText, "Dead")
+        XCTAssertEqual(uiSpy.updatedCharacters.first?.statusColor, .systemRed)
+    }
+
+    func test_whenGetCharacters_withUnknownStatus_shouldMapStatusTextAndColorCorrectly() async {
+        getCharactersUseCaseSpy.pageResult = CharactersPage(
+            characters: [.fixture(status: "unknown")],
+            hasNextPage: false
+        )
+        let uiSpy = ListCharactersUISpy()
+        sut.ui = uiSpy
+
+        await sut.getCharacters()
+
+        XCTAssertEqual(uiSpy.updatedCharacters.first?.statusText, "Unknown")
+        XCTAssertEqual(uiSpy.updatedCharacters.first?.statusColor, .systemGray)
+    }
+
+    func test_whenGetCharacters_withArbitraryStatus_shouldFallbackToUnknown() async {
+        getCharactersUseCaseSpy.pageResult = CharactersPage(
+            characters: [.fixture(status: "Zombie")],
+            hasNextPage: false
+        )
+        let uiSpy = ListCharactersUISpy()
+        sut.ui = uiSpy
+
+        await sut.getCharacters()
+
+        XCTAssertEqual(uiSpy.updatedCharacters.first?.statusText, "Unknown")
+        XCTAssertEqual(uiSpy.updatedCharacters.first?.statusColor, .systemGray)
+    }
+
+    func test_whenGetCharacters_succeeds_shouldMapNameAndSpeciesCorrectly() async {
+        getCharactersUseCaseSpy.pageResult = CharactersPage(
+            characters: [.fixture(name: "Morty Smith", species: "Human")],
+            hasNextPage: false
+        )
+        let uiSpy = ListCharactersUISpy()
+        sut.ui = uiSpy
+
+        await sut.getCharacters()
+
+        XCTAssertEqual(uiSpy.updatedCharacters.first?.name, "Morty Smith")
+        XCTAssertEqual(uiSpy.updatedCharacters.first?.species, "Human")
+    }
+
+    // MARK: - character(at:)
+
+    func test_whenCharacterAt_withValidIndex_shouldReturnCorrectCharacter() async {
+        let morty = Character.fixture(id: 1, name: "Morty Smith")
+        let rick = Character.fixture(id: 2, name: "Rick Sanchez")
+        getCharactersUseCaseSpy.pageResult = CharactersPage(characters: [morty, rick], hasNextPage: false)
+        sut.ui = ListCharactersUISpy()
+
+        await sut.getCharacters()
+
+        XCTAssertEqual(sut.character(at: 0)?.name, "Morty Smith")
+        XCTAssertEqual(sut.character(at: 1)?.name, "Rick Sanchez")
+    }
+
+    func test_whenCharacterAt_withOutOfBoundsIndex_shouldReturnNil() async {
+        getCharactersUseCaseSpy.pageResult = CharactersPage(characters: [.fixture()], hasNextPage: false)
+        sut.ui = ListCharactersUISpy()
+
+        await sut.getCharacters()
+
+        XCTAssertNil(sut.character(at: 99))
+    }
+
+    func test_whenCharacterAt_duringActiveSearch_shouldReturnFromFilteredList() async {
+        let morty = Character.fixture(id: 1, name: "Morty Smith")
+        let rick = Character.fixture(id: 2, name: "Rick Sanchez")
+        getCharactersUseCaseSpy.pageResult = CharactersPage(characters: [morty, rick], hasNextPage: false)
+        sut.ui = ListCharactersUISpy()
+
+        await sut.getCharacters()
+        sut.searchCharacters(name: "Rick")
+
+        XCTAssertEqual(sut.character(at: 0)?.name, "Rick Sanchez")
+        XCTAssertNil(sut.character(at: 1))
+    }
+
+    func test_whenCharacterAt_afterClearSearch_shouldReturnFromFullList() async {
+        let morty = Character.fixture(id: 1, name: "Morty Smith")
+        let rick = Character.fixture(id: 2, name: "Rick Sanchez")
+        getCharactersUseCaseSpy.pageResult = CharactersPage(characters: [morty, rick], hasNextPage: false)
+        sut.ui = ListCharactersUISpy()
+
+        await sut.getCharacters()
+        sut.searchCharacters(name: "Rick")
+        sut.clearSearch()
+
+        XCTAssertEqual(sut.character(at: 0)?.name, "Morty Smith")
+        XCTAssertEqual(sut.character(at: 1)?.name, "Rick Sanchez")
+    }
+
+    func test_whenCharacterAt_beforeGetCharacters_shouldReturnNil() {
+        XCTAssertNil(sut.character(at: 0))
+    }
+
+    func test_whenCharacterAt_afterLoadNextPage_shouldReturnCharactersAcrossPages() async {
+        let firstPage = [Character.fixture(id: 1, name: "Morty Smith")]
+        let secondPage = [Character.fixture(id: 2, name: "Rick Sanchez")]
+        getCharactersUseCaseSpy.pageResult = CharactersPage(characters: firstPage, hasNextPage: true)
+        let uiSpy = ListCharactersUISpy()
+        sut.ui = uiSpy
+
+        await sut.getCharacters()
+
+        getCharactersUseCaseSpy.pageResult = CharactersPage(characters: secondPage, hasNextPage: false)
+        await sut.loadNextPage()
+
+        XCTAssertEqual(sut.character(at: 0)?.name, "Morty Smith")
+        XCTAssertEqual(sut.character(at: 1)?.name, "Rick Sanchez")
+    }
+
+    func test_whenLoadNextPage_succeeds_shouldMapAppendedCharactersCorrectly() async {
+        getCharactersUseCaseSpy.pageResult = CharactersPage(characters: [.fixture()], hasNextPage: true)
+        let uiSpy = ListCharactersUISpy()
+        sut.ui = uiSpy
+
+        await sut.getCharacters()
+
+        getCharactersUseCaseSpy.pageResult = CharactersPage(
+            characters: [.fixture(id: 2, status: "dead")],
+            hasNextPage: false
+        )
+        await sut.loadNextPage()
+
+        XCTAssertEqual(uiSpy.appendedCharacters.first?.statusText, "Dead")
+        XCTAssertEqual(uiSpy.appendedCharacters.first?.statusColor, .systemRed)
+    }
 }

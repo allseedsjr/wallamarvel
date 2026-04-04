@@ -1,4 +1,5 @@
 import Foundation
+import UIKit
 
 @MainActor
 protocol ListCharactersPresenterProtocol: AnyObject {
@@ -9,14 +10,15 @@ protocol ListCharactersPresenterProtocol: AnyObject {
     func retryNextPage() async
     func searchCharacters(name: String)
     func clearSearch()
+    func character(at index: Int) -> Character?
 }
 
 @MainActor
 protocol ListCharactersUI: AnyObject {
     func showLoading()
     func hideLoading()
-    func update(characters: [Character])
-    func appendCharacters(_ newCharacters: [Character])
+    func update(characters: [CharacterCellViewModel])
+    func appendCharacters(_ newCharacters: [CharacterCellViewModel])
     func showPaginationLoading()
     func hidePaginationLoading()
     func showError(_ error: AppError)
@@ -38,6 +40,7 @@ final class ListCharactersPresenter: ListCharactersPresenterProtocol {
     private var isLoadingPage = false
     private var isPaginationBlocked = false
     private var allCharacters: [Character] = []
+    private var displayedCharacters: [Character] = []
     private var isSearchActive = false
 
     init(getCharactersUseCase: GetCharactersUseCaseProtocol) {
@@ -48,6 +51,11 @@ final class ListCharactersPresenter: ListCharactersPresenterProtocol {
         Strings.screenTitle
     }
 
+    func character(at index: Int) -> Character? {
+        guard index < displayedCharacters.count else { return nil }
+        return displayedCharacters[index]
+    }
+
     func getCharacters() async {
         ui?.showLoading()
         currentPage = 1
@@ -56,13 +64,15 @@ final class ListCharactersPresenter: ListCharactersPresenterProtocol {
         isPaginationBlocked = false
         isSearchActive = false
         allCharacters = []
+        displayedCharacters = []
 
         do {
             let page = try await getCharactersUseCase.execute(page: currentPage)
             hasNextPage = page.hasNextPage
             allCharacters = page.characters
+            displayedCharacters = allCharacters
             ui?.hideLoading()
-            ui?.update(characters: allCharacters)
+            ui?.update(characters: map(allCharacters))
         } catch let error as AppError {
             ui?.hideLoading()
             ui?.showError(error)
@@ -83,7 +93,8 @@ final class ListCharactersPresenter: ListCharactersPresenterProtocol {
             currentPage += 1
             hasNextPage = page.hasNextPage
             allCharacters.append(contentsOf: page.characters)
-            ui?.appendCharacters(page.characters)
+            displayedCharacters = allCharacters
+            ui?.appendCharacters(map(page.characters))
         } catch let error as AppError {
             isPaginationBlocked = true
             ui?.showPaginationError(error)
@@ -111,15 +122,40 @@ final class ListCharactersPresenter: ListCharactersPresenterProtocol {
         let filtered = allCharacters.filter {
             $0.name.localizedCaseInsensitiveContains(query)
         }
+        displayedCharacters = filtered
         if filtered.isEmpty {
             ui?.showEmptySearch()
         } else {
-            ui?.update(characters: filtered)
+            ui?.update(characters: map(filtered))
         }
     }
 
     func clearSearch() {
         isSearchActive = false
-        ui?.update(characters: allCharacters)
+        displayedCharacters = allCharacters
+        ui?.update(characters: map(allCharacters))
+    }
+
+    // MARK: - Private
+
+    private func map(_ characters: [Character]) -> [CharacterCellViewModel] {
+        characters.map { map($0) }
+    }
+
+    private func map(_ character: Character) -> CharacterCellViewModel {
+        let (statusText, statusColor): (String, UIColor) = {
+            switch character.status.lowercased() {
+            case "alive": return ("Alive", .systemGreen)
+            case "dead":  return ("Dead", .systemRed)
+            default:      return ("Unknown", .systemGray)
+            }
+        }()
+        return CharacterCellViewModel(
+            name: character.name,
+            species: character.species,
+            imageURL: URL(string: character.imageURL),
+            statusText: statusText,
+            statusColor: statusColor
+        )
     }
 }
