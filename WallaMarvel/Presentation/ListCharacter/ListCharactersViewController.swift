@@ -9,6 +9,8 @@ final class ListCharactersViewController: UIViewController {
         static let paginationErrorTitle = "Error loading more"
         static let retry = "Retry"
         static let dismiss = "Dismiss"
+        static let searchPlaceholder = "Search characters"
+        static let searchAccessibilityLabel = "Search characters"
     }
     var mainView: ListCharactersView { return view as! ListCharactersView }
 
@@ -18,6 +20,15 @@ final class ListCharactersViewController: UIViewController {
 
     private let paginationThreshold = Constants.paginationThreshold
     private var isPaginatingFromScroll = false
+    private var searchDebounceTask: Task<Void, Never>?
+
+    private let searchController: UISearchController = {
+        let sc = UISearchController(searchResultsController: nil)
+        sc.obscuresBackgroundDuringPresentation = false
+        sc.searchBar.placeholder = Strings.searchPlaceholder
+        sc.searchBar.accessibilityLabel = Strings.searchAccessibilityLabel
+        return sc
+    }()
 
     override func loadView() {
         view = ListCharactersView()
@@ -32,6 +43,15 @@ final class ListCharactersViewController: UIViewController {
         }
 
         title = presenter?.screenTitle()
+        setupSearchController()
+    }
+
+    private func setupSearchController() {
+        searchController.searchResultsUpdater = self
+        searchController.searchBar.delegate = self
+        navigationItem.searchController = searchController
+        navigationItem.hidesSearchBarWhenScrolling = true
+        definesPresentationContext = true
     }
 }
 
@@ -80,6 +100,10 @@ extension ListCharactersViewController: ListCharactersUI {
         present(alert, animated: true)
     }
 
+    func showEmptySearch() {
+        mainView.showEmptySearch()
+    }
+
     @objc
     private func handleRetryTap() {
         mainView.setRetryEnabled(false)
@@ -104,5 +128,30 @@ extension ListCharactersViewController: UITableViewDelegate {
             await self?.presenter?.loadNextPage()
             self?.isPaginatingFromScroll = false
         }
+    }
+}
+
+extension ListCharactersViewController: UISearchResultsUpdating {
+    func updateSearchResults(for searchController: UISearchController) {
+        let query = searchController.searchBar.text ?? ""
+        searchDebounceTask?.cancel()
+        searchDebounceTask = Task { @MainActor [weak self] in
+            try? await Task.sleep(nanoseconds: 500_000_000)
+            guard !Task.isCancelled else { return }
+            if query.trimmingCharacters(in: .whitespaces).isEmpty {
+                self?.presenter?.clearSearch()
+                self?.mainView.showCharacters()
+            } else {
+                self?.presenter?.searchCharacters(name: query)
+            }
+        }
+    }
+}
+
+extension ListCharactersViewController: UISearchBarDelegate {
+    func searchBarCancelButtonClicked(_ searchBar: UISearchBar) {
+        searchDebounceTask?.cancel()
+        presenter?.clearSearch()
+        mainView.showCharacters()
     }
 }

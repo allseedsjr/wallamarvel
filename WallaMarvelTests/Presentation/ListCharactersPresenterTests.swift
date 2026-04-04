@@ -236,4 +236,100 @@ final class ListCharactersPresenterTests: XCTestCase {
         XCTAssertTrue(getCharactersUseCaseSpy.executeCalled)
         XCTAssertEqual(uiSpy.appendedCharacters.count, 1)
     }
+
+    // MARK: - searchCharacters
+
+    func test_whenSearchCharacters_withMatchingName_shouldUpdateUIWithFilteredResults() async {
+        let morty = Character.fixture(id: 1, name: "Morty Smith")
+        let rick = Character.fixture(id: 2, name: "Rick Sanchez")
+        getCharactersUseCaseSpy.pageResult = CharactersPage(characters: [morty, rick], hasNextPage: false)
+        let uiSpy = ListCharactersUISpy()
+        sut.ui = uiSpy
+
+        await sut.getCharacters()
+        sut.searchCharacters(name: "Morty")
+
+        XCTAssertEqual(uiSpy.updatedCharacters.count, 1)
+        XCTAssertEqual(uiSpy.updatedCharacters.first?.name, "Morty Smith")
+    }
+
+    func test_whenSearchCharacters_isCaseInsensitive() async {
+        let morty = Character.fixture(id: 1, name: "Morty Smith")
+        let rick = Character.fixture(id: 2, name: "Rick Sanchez")
+        getCharactersUseCaseSpy.pageResult = CharactersPage(characters: [morty, rick], hasNextPage: false)
+        let uiSpy = ListCharactersUISpy()
+        sut.ui = uiSpy
+
+        await sut.getCharacters()
+        sut.searchCharacters(name: "morty")
+
+        XCTAssertEqual(uiSpy.updatedCharacters.count, 1)
+        XCTAssertEqual(uiSpy.updatedCharacters.first?.name, "Morty Smith")
+    }
+
+    func test_whenSearchCharacters_withNoMatch_shouldShowEmptySearch() async {
+        let morty = Character.fixture(id: 1, name: "Morty Smith")
+        getCharactersUseCaseSpy.pageResult = CharactersPage(characters: [morty], hasNextPage: false)
+        let uiSpy = ListCharactersUISpy()
+        sut.ui = uiSpy
+
+        await sut.getCharacters()
+        sut.searchCharacters(name: "Zorg")
+
+        XCTAssertTrue(uiSpy.showEmptySearchWasCalled)
+    }
+
+    func test_whenSearchCharacters_withEmptyString_shouldRestoreFullList() async {
+        let morty = Character.fixture(id: 1, name: "Morty Smith")
+        let rick = Character.fixture(id: 2, name: "Rick Sanchez")
+        getCharactersUseCaseSpy.pageResult = CharactersPage(characters: [morty, rick], hasNextPage: false)
+        let uiSpy = ListCharactersUISpy()
+        sut.ui = uiSpy
+
+        await sut.getCharacters()
+        sut.searchCharacters(name: "Morty")
+        sut.searchCharacters(name: "")
+
+        XCTAssertEqual(uiSpy.updatedCharacters.count, 2)
+    }
+
+    func test_whenSearchCharacters_withWhitespaceOnly_shouldRestoreFullList() async {
+        let morty = Character.fixture(id: 1, name: "Morty Smith")
+        getCharactersUseCaseSpy.pageResult = CharactersPage(characters: [morty], hasNextPage: false)
+        let uiSpy = ListCharactersUISpy()
+        sut.ui = uiSpy
+
+        await sut.getCharacters()
+        sut.searchCharacters(name: "   ")
+
+        XCTAssertEqual(uiSpy.updatedCharacters.count, 1)
+    }
+
+    func test_whenClearSearch_shouldRestoreFullList() async {
+        let morty = Character.fixture(id: 1, name: "Morty Smith")
+        let rick = Character.fixture(id: 2, name: "Rick Sanchez")
+        getCharactersUseCaseSpy.pageResult = CharactersPage(characters: [morty, rick], hasNextPage: false)
+        let uiSpy = ListCharactersUISpy()
+        sut.ui = uiSpy
+
+        await sut.getCharacters()
+        sut.searchCharacters(name: "Morty")
+        sut.clearSearch()
+
+        XCTAssertEqual(uiSpy.updatedCharacters.count, 2)
+    }
+
+    func test_whenLoadNextPage_withSearchActive_shouldNotCallUseCase() async {
+        getCharactersUseCaseSpy.pageResult = CharactersPage(characters: [.fixture()], hasNextPage: true)
+        let uiSpy = ListCharactersUISpy()
+        sut.ui = uiSpy
+
+        await sut.getCharacters()
+        sut.searchCharacters(name: "Morty")
+        getCharactersUseCaseSpy.resetCallTracking()
+
+        await sut.loadNextPage()
+
+        XCTAssertFalse(getCharactersUseCaseSpy.executeCalled)
+    }
 }
