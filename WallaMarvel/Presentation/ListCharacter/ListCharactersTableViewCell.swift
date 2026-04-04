@@ -5,12 +5,22 @@ import Kingfisher
 final class ListCharactersTableViewCell: UITableViewCell {
     private enum Constants {
         static let imageSize: CGFloat = 80
+        static let imageCornerRadius: CGFloat = 40
         static let outerSpacing: CGFloat = 12
         static let innerSpacing: CGFloat = 8
+    }
+
+    private enum Strings {
+        static let placeholderImage = "person.crop.circle.fill"
+        static let accessibilityHint = "Double tap to see more details"
     }
     private let characterImageView: UIImageView = {
         let imageView = UIImageView()
         imageView.translatesAutoresizingMaskIntoConstraints = false
+        imageView.contentMode = .scaleAspectFill
+        imageView.clipsToBounds = true
+        imageView.tintColor = .systemGray3
+        imageView.layer.cornerRadius = Constants.imageCornerRadius
         return imageView
     }()
     
@@ -38,7 +48,7 @@ final class ListCharactersTableViewCell: UITableViewCell {
 
     private func setupAccessibility() {
         isAccessibilityElement = true
-        accessibilityHint = "Double tap to see more details"
+        accessibilityHint = Strings.accessibilityHint
         characterImageView.isAccessibilityElement = false
         characterName.isAccessibilityElement = false
     }
@@ -64,7 +74,8 @@ final class ListCharactersTableViewCell: UITableViewCell {
     }
     
     func configure(model: Character) {
-        characterImageView.kf.setImage(with: URL(string: model.imageURL))
+        let placeholder = UIImage(systemName: Strings.placeholderImage)
+        characterImageView.kf.setImage(with: URL(string: model.imageURL), placeholder: placeholder)
         characterName.text = model.name
         accessibilityLabel = "Character: \(model.name)."
     }
