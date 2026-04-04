@@ -9,13 +9,10 @@ final class DetailCharacterViewController: UIViewController {
         static let stackSpacing: CGFloat = 16
         static let contentInset: CGFloat = 16
         static let contentVerticalInset: CGFloat = 24
-        static let imageSize: CGFloat = 200
-        static let imageCornerRadius: CGFloat = 100
-        static let badgeFontSize: CGFloat = 14
+        static let imageSize: CGFloat = UIDevice.current.userInterfaceIdiom == .pad ? 300 : 200
+        static var imageCornerRadius: CGFloat { imageSize / 2 }
         static let badgeCornerRadius: CGFloat = 10
         static let badgeHeight: CGFloat = 28
-        static let sectionFontSize: CGFloat = 17
-        static let rowFontSize: CGFloat = 15
         static let rowSpacing: CGFloat = 8
         static let imageFadeDuration: CGFloat = 0.2
     }
@@ -58,14 +55,14 @@ final class DetailCharacterViewController: UIViewController {
         let iv = UIImageView()
         iv.contentMode = .scaleAspectFill
         iv.clipsToBounds = true
-        iv.layer.cornerRadius = Constants.imageCornerRadius
         iv.translatesAutoresizingMaskIntoConstraints = false
         return iv
     }()
 
     private let statusBadge: UILabel = {
         let label = UILabel()
-        label.font = .systemFont(ofSize: Constants.badgeFontSize, weight: .semibold)
+        label.font = UIFont.adaptive(textStyle: .footnote, weight: .semibold)
+        label.adjustsFontForContentSizeCategory = true
         label.textColor = .white
         label.layer.cornerRadius = Constants.badgeCornerRadius
         label.layer.masksToBounds = true
@@ -77,7 +74,8 @@ final class DetailCharacterViewController: UIViewController {
     private let episodeSectionLabel: UILabel = {
         let label = UILabel()
         label.text = Strings.firstSeenIn
-        label.font = .systemFont(ofSize: Constants.sectionFontSize, weight: .semibold)
+        label.font = .adaptive(textStyle: .headline)
+        label.adjustsFontForContentSizeCategory = true
         return label
     }()
 
@@ -90,7 +88,8 @@ final class DetailCharacterViewController: UIViewController {
     private let episodeInfoLabel: UILabel = {
         let label = UILabel()
         label.numberOfLines = 0
-        label.font = .systemFont(ofSize: Constants.rowFontSize)
+        label.font = .adaptive(textStyle: .subheadline)
+        label.adjustsFontForContentSizeCategory = true
         label.isHidden = true
         return label
     }()
@@ -98,7 +97,8 @@ final class DetailCharacterViewController: UIViewController {
     private let episodeErrorLabel: UILabel = {
         let label = UILabel()
         label.numberOfLines = 0
-        label.font = .systemFont(ofSize: Constants.rowFontSize)
+        label.font = .adaptive(textStyle: .subheadline)
+        label.adjustsFontForContentSizeCategory = true
         label.textColor = .systemRed
         label.isHidden = true
         return label
@@ -176,6 +176,7 @@ final class DetailCharacterViewController: UIViewController {
             imageView.widthAnchor.constraint(equalToConstant: Constants.imageSize),
             imageView.heightAnchor.constraint(equalToConstant: Constants.imageSize)
         ])
+        imageView.layer.cornerRadius = Constants.imageCornerRadius
         contentStack.addArrangedSubview(container)
 
         imageView.isAccessibilityElement = false
@@ -240,13 +241,15 @@ final class DetailCharacterViewController: UIViewController {
 
         let titleLabel = UILabel()
         titleLabel.text = title
-        titleLabel.font = .systemFont(ofSize: Constants.rowFontSize, weight: .semibold)
+        titleLabel.font = UIFont.adaptive(textStyle: .subheadline, weight: .semibold)
+        titleLabel.adjustsFontForContentSizeCategory = true
         titleLabel.setContentHuggingPriority(.defaultHigh, for: .horizontal)
         titleLabel.isAccessibilityElement = false
 
         let valueLabel = UILabel()
         valueLabel.text = value
-        valueLabel.font = .systemFont(ofSize: Constants.rowFontSize)
+        valueLabel.font = .adaptive(textStyle: .subheadline)
+        valueLabel.adjustsFontForContentSizeCategory = true
         valueLabel.textAlignment = .right
         valueLabel.numberOfLines = 0
         valueLabel.isAccessibilityElement = false

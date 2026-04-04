@@ -10,7 +10,6 @@ final class ListCharactersView: UIView {
         static let retryButtonWidth: CGFloat = 120
         static let retryButtonHeight: CGFloat = 44
         static let retryButtonCornerRadius: CGFloat = 8
-        static let fontSize: CGFloat = 16
         static let emptySearchIconSize: CGFloat = 60
         static let emptySearchSpacing: CGFloat = 16
         static let emptySearchHorizontalInset: CGFloat = 32
@@ -75,7 +74,8 @@ final class ListCharactersView: UIView {
         let label = UILabel()
         label.translatesAutoresizingMaskIntoConstraints = false
         label.text = Strings.emptySearchTitle
-        label.font = UIFont.systemFont(ofSize: 18, weight: .semibold)
+        label.font = UIFont.adaptive(textStyle: .headline)
+        label.adjustsFontForContentSizeCategory = true
         label.textAlignment = .center
         label.textColor = .label
         label.isAccessibilityElement = false
@@ -86,7 +86,8 @@ final class ListCharactersView: UIView {
         let label = UILabel()
         label.translatesAutoresizingMaskIntoConstraints = false
         label.text = Strings.emptySearchMessage
-        label.font = UIFont.systemFont(ofSize: 15)
+        label.font = UIFont.adaptive(textStyle: .subheadline)
+        label.adjustsFontForContentSizeCategory = true
         label.textAlignment = .center
         label.textColor = .secondaryLabel
         label.numberOfLines = 0
@@ -99,7 +100,8 @@ final class ListCharactersView: UIView {
         label.translatesAutoresizingMaskIntoConstraints = false
         label.numberOfLines = 0
         label.textAlignment = .center
-        label.font = UIFont.systemFont(ofSize: Constants.fontSize, weight: .regular)
+        label.font = UIFont.adaptive(textStyle: .body)
+        label.adjustsFontForContentSizeCategory = true
         label.textColor = .darkText
         return label
     }()
@@ -108,7 +110,8 @@ final class ListCharactersView: UIView {
         let button = UIButton(type: .system)
         button.translatesAutoresizingMaskIntoConstraints = false
         button.setTitle(Strings.retry, for: .normal)
-        button.titleLabel?.font = UIFont.systemFont(ofSize: Constants.fontSize, weight: .semibold)
+        button.titleLabel?.font = UIFont.adaptive(textStyle: .headline)
+        button.titleLabel?.adjustsFontForContentSizeCategory = true
         button.backgroundColor = .systemBlue
         button.setTitleColor(.white, for: .normal)
         button.layer.cornerRadius = Constants.retryButtonCornerRadius
