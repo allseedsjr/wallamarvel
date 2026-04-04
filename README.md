@@ -28,7 +28,7 @@ Principles applied throughout the project:
 
 ### Starting Point — Received Codebase
 
-The project was received with **Marvel API** integration via `URLSession`, using **CocoaPods** with Kingfisher as the only dependency. The initial structure already included `MarvelDataSource`, `MarvelRepository`, `GetHeroes` and the `ListHeroes` screens. Presentation files were moved into a `Presentation/` folder as the first action.
+The project was received with **Marvel API** integration via `URLSession`, using **SPM** with Kingfisher as the only dependency. The initial structure already included `MarvelDataSource`, `MarvelRepository`, `GetHeroes` and the `ListHeroes` screens. Presentation files were moved into a `Presentation/` folder as the first action.
 
 ### WP-01 — API Migration and Test Infrastructure
 
