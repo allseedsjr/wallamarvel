@@ -189,6 +189,16 @@ The project was received with **Marvel API** integration via `URLSession`, using
 
 ---
 
+### WP-15 — Visual Polish: Placeholder and Circular Images
+
+**`ListCharactersTableViewCell`:**
+- Placeholder (`person.crop.circle.fill`) displayed while Kingfisher loads the character thumbnail, preventing empty space during network requests
+- `contentMode = .scaleAspectFill` and `clipsToBounds = true` applied to the image view for correct cropping inside the fixed frame
+- Circular corner radius (`40pt` — half of the 80pt image size), consistent with the style already used on the detail screen
+- `placeholderImage` and `accessibilityHint` string literals moved to `private enum Strings`, completing the Constants/Strings enum discipline applied in WP-12
+
+---
+
 ## Technical Decisions
 
 ### Local filter vs. API search
