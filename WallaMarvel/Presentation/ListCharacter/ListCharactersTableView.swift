@@ -1,7 +1,7 @@
 import Foundation
 import UIKit
 
-final class ListCharactersView: UIView {
+final class ListCharactersView: UIView, ViewCode {
     private enum Constants {
         static let estimatedRowHeight: CGFloat = 120
         static let errorLabelHorizontalInset: CGFloat = 24
@@ -131,14 +131,10 @@ final class ListCharactersView: UIView {
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-    
-    private func setup() {
-        backgroundColor = .black
-        addSubviews()
-        addContraints()
-    }
-    
-    private func addSubviews() {
+
+    // MARK: - ViewCode
+
+    func setupComponent() {
         addSubview(charactersTableView)
         addSubview(errorContainerView)
         addSubview(emptySearchContainerView)
@@ -151,54 +147,9 @@ final class ListCharactersView: UIView {
         emptySearchContainerView.addSubview(emptySearchTitleLabel)
         emptySearchContainerView.addSubview(emptySearchMessageLabel)
     }
-    
-    private func addContraints() {
-        NSLayoutConstraint.activate([
-            charactersTableView.leadingAnchor.constraint(equalTo: leadingAnchor),
-            charactersTableView.trailingAnchor.constraint(equalTo: trailingAnchor),
-            charactersTableView.topAnchor.constraint(equalTo: topAnchor),
-            charactersTableView.bottomAnchor.constraint(equalTo: bottomAnchor),
-            
-            loadingView.leadingAnchor.constraint(equalTo: leadingAnchor),
-            loadingView.trailingAnchor.constraint(equalTo: trailingAnchor),
-            loadingView.topAnchor.constraint(equalTo: topAnchor),
-            loadingView.bottomAnchor.constraint(equalTo: bottomAnchor),
-            
-            loadingIndicator.centerXAnchor.constraint(equalTo: loadingView.centerXAnchor),
-            loadingIndicator.centerYAnchor.constraint(equalTo: loadingView.centerYAnchor),
-            
-            errorContainerView.leadingAnchor.constraint(equalTo: leadingAnchor),
-            errorContainerView.trailingAnchor.constraint(equalTo: trailingAnchor),
-            errorContainerView.topAnchor.constraint(equalTo: topAnchor),
-            errorContainerView.bottomAnchor.constraint(equalTo: bottomAnchor),
-            
-            errorLabel.leadingAnchor.constraint(equalTo: errorContainerView.leadingAnchor, constant: Constants.errorLabelHorizontalInset),
-            errorLabel.trailingAnchor.constraint(equalTo: errorContainerView.trailingAnchor, constant: -Constants.errorLabelHorizontalInset),
-            errorLabel.centerYAnchor.constraint(equalTo: errorContainerView.centerYAnchor, constant: Constants.errorLabelVerticalOffset),
-            
-            retryButton.topAnchor.constraint(equalTo: errorLabel.bottomAnchor, constant: Constants.retryButtonTopSpacing),
-            retryButton.centerXAnchor.constraint(equalTo: errorContainerView.centerXAnchor),
-            retryButton.widthAnchor.constraint(equalToConstant: Constants.retryButtonWidth),
-            retryButton.heightAnchor.constraint(equalToConstant: Constants.retryButtonHeight),
 
-            emptySearchContainerView.leadingAnchor.constraint(equalTo: leadingAnchor),
-            emptySearchContainerView.trailingAnchor.constraint(equalTo: trailingAnchor),
-            emptySearchContainerView.topAnchor.constraint(equalTo: topAnchor),
-            emptySearchContainerView.bottomAnchor.constraint(equalTo: bottomAnchor),
-
-            emptySearchIconView.centerXAnchor.constraint(equalTo: emptySearchContainerView.centerXAnchor),
-            emptySearchIconView.centerYAnchor.constraint(equalTo: emptySearchContainerView.centerYAnchor, constant: -Constants.emptySearchSpacing * 2),
-            emptySearchIconView.widthAnchor.constraint(equalToConstant: Constants.emptySearchIconSize),
-            emptySearchIconView.heightAnchor.constraint(equalToConstant: Constants.emptySearchIconSize),
-
-            emptySearchTitleLabel.topAnchor.constraint(equalTo: emptySearchIconView.bottomAnchor, constant: Constants.emptySearchSpacing),
-            emptySearchTitleLabel.leadingAnchor.constraint(equalTo: emptySearchContainerView.leadingAnchor, constant: Constants.emptySearchHorizontalInset),
-            emptySearchTitleLabel.trailingAnchor.constraint(equalTo: emptySearchContainerView.trailingAnchor, constant: -Constants.emptySearchHorizontalInset),
-
-            emptySearchMessageLabel.topAnchor.constraint(equalTo: emptySearchTitleLabel.bottomAnchor, constant: Constants.emptySearchSpacing / 2),
-            emptySearchMessageLabel.leadingAnchor.constraint(equalTo: emptySearchContainerView.leadingAnchor, constant: Constants.emptySearchHorizontalInset),
-            emptySearchMessageLabel.trailingAnchor.constraint(equalTo: emptySearchContainerView.trailingAnchor, constant: -Constants.emptySearchHorizontalInset),
-        ])
+    func setupExtraConfiguration() {
+        backgroundColor = .black
     }
 
     func configureTableView(delegate: UITableViewDelegate) -> ListCharactersAdapter {
@@ -255,5 +206,58 @@ final class ListCharactersView: UIView {
     func setRetryTarget(_ target: Any?, action: Selector) {
         retryButton.removeTarget(nil, action: nil, for: .allEvents)
         retryButton.addTarget(target, action: action, for: .touchUpInside)
+    }
+}
+
+// MARK: - ViewCode
+
+extension ListCharactersView {
+    func setupConstrain() {
+        NSLayoutConstraint.activate([
+            charactersTableView.leadingAnchor.constraint(equalTo: leadingAnchor),
+            charactersTableView.trailingAnchor.constraint(equalTo: trailingAnchor),
+            charactersTableView.topAnchor.constraint(equalTo: topAnchor),
+            charactersTableView.bottomAnchor.constraint(equalTo: bottomAnchor),
+
+            loadingView.leadingAnchor.constraint(equalTo: leadingAnchor),
+            loadingView.trailingAnchor.constraint(equalTo: trailingAnchor),
+            loadingView.topAnchor.constraint(equalTo: topAnchor),
+            loadingView.bottomAnchor.constraint(equalTo: bottomAnchor),
+
+            loadingIndicator.centerXAnchor.constraint(equalTo: loadingView.centerXAnchor),
+            loadingIndicator.centerYAnchor.constraint(equalTo: loadingView.centerYAnchor),
+
+            errorContainerView.leadingAnchor.constraint(equalTo: leadingAnchor),
+            errorContainerView.trailingAnchor.constraint(equalTo: trailingAnchor),
+            errorContainerView.topAnchor.constraint(equalTo: topAnchor),
+            errorContainerView.bottomAnchor.constraint(equalTo: bottomAnchor),
+
+            errorLabel.leadingAnchor.constraint(equalTo: errorContainerView.leadingAnchor, constant: Constants.errorLabelHorizontalInset),
+            errorLabel.trailingAnchor.constraint(equalTo: errorContainerView.trailingAnchor, constant: -Constants.errorLabelHorizontalInset),
+            errorLabel.centerYAnchor.constraint(equalTo: errorContainerView.centerYAnchor, constant: Constants.errorLabelVerticalOffset),
+
+            retryButton.topAnchor.constraint(equalTo: errorLabel.bottomAnchor, constant: Constants.retryButtonTopSpacing),
+            retryButton.centerXAnchor.constraint(equalTo: errorContainerView.centerXAnchor),
+            retryButton.widthAnchor.constraint(equalToConstant: Constants.retryButtonWidth),
+            retryButton.heightAnchor.constraint(equalToConstant: Constants.retryButtonHeight),
+
+            emptySearchContainerView.leadingAnchor.constraint(equalTo: leadingAnchor),
+            emptySearchContainerView.trailingAnchor.constraint(equalTo: trailingAnchor),
+            emptySearchContainerView.topAnchor.constraint(equalTo: topAnchor),
+            emptySearchContainerView.bottomAnchor.constraint(equalTo: bottomAnchor),
+
+            emptySearchIconView.centerXAnchor.constraint(equalTo: emptySearchContainerView.centerXAnchor),
+            emptySearchIconView.centerYAnchor.constraint(equalTo: emptySearchContainerView.centerYAnchor, constant: -Constants.emptySearchSpacing * 2),
+            emptySearchIconView.widthAnchor.constraint(equalToConstant: Constants.emptySearchIconSize),
+            emptySearchIconView.heightAnchor.constraint(equalToConstant: Constants.emptySearchIconSize),
+
+            emptySearchTitleLabel.topAnchor.constraint(equalTo: emptySearchIconView.bottomAnchor, constant: Constants.emptySearchSpacing),
+            emptySearchTitleLabel.leadingAnchor.constraint(equalTo: emptySearchContainerView.leadingAnchor, constant: Constants.emptySearchHorizontalInset),
+            emptySearchTitleLabel.trailingAnchor.constraint(equalTo: emptySearchContainerView.trailingAnchor, constant: -Constants.emptySearchHorizontalInset),
+
+            emptySearchMessageLabel.topAnchor.constraint(equalTo: emptySearchTitleLabel.bottomAnchor, constant: Constants.emptySearchSpacing / 2),
+            emptySearchMessageLabel.leadingAnchor.constraint(equalTo: emptySearchContainerView.leadingAnchor, constant: Constants.emptySearchHorizontalInset),
+            emptySearchMessageLabel.trailingAnchor.constraint(equalTo: emptySearchContainerView.trailingAnchor, constant: -Constants.emptySearchHorizontalInset),
+        ])
     }
 }
