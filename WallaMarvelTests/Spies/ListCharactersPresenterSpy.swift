@@ -10,6 +10,9 @@ final class ListCharactersPresenterSpy: ListCharactersPresenterProtocol {
     private(set) var lastSearchedName: String?
     private(set) var clearSearchCalled = false
 
+    private(set) var characterAtIndexCalled = false
+    private(set) var lastRequestedIndex: Int?
+
     func screenTitle() -> String {
         screenTitleCalled = true
         return "Characters"
@@ -34,5 +37,11 @@ final class ListCharactersPresenterSpy: ListCharactersPresenterProtocol {
 
     func clearSearch() {
         clearSearchCalled = true
+    }
+
+    func character(at index: Int) -> Character? {
+        characterAtIndexCalled = true
+        lastRequestedIndex = index
+        return nil
     }
 }

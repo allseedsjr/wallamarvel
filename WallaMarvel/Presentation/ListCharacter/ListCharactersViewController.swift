@@ -64,12 +64,12 @@ extension ListCharactersViewController: ListCharactersUI {
         mainView.hideLoading()
     }
 
-    func update(characters: [Character]) {
+    func update(characters: [CharacterCellViewModel]) {
         mainView.showCharacters()
         listCharactersProvider?.setCharacters(characters)
     }
 
-    func appendCharacters(_ newCharacters: [Character]) {
+    func appendCharacters(_ newCharacters: [CharacterCellViewModel]) {
         listCharactersProvider?.appendCharacters(newCharacters)
     }
 
@@ -115,7 +115,7 @@ extension ListCharactersViewController: ListCharactersUI {
 
 extension ListCharactersViewController: UITableViewDelegate {
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        guard let character = listCharactersProvider?.characters[indexPath.row] else { return }
+        guard let character = presenter?.character(at: indexPath.row) else { return }
         coordinator?.showDetail(for: character)
     }
 

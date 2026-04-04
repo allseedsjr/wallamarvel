@@ -2,7 +2,7 @@ import Foundation
 import UIKit
 
 final class ListCharactersAdapter: NSObject, UITableViewDataSource {
-    private(set) var characters: [Character] = []
+    private(set) var viewModels: [CharacterCellViewModel] = []
     private let tableView: UITableView
     private let paginationFooter: UIActivityIndicatorView = {
         let indicator = UIActivityIndicatorView(style: .medium)
@@ -10,22 +10,22 @@ final class ListCharactersAdapter: NSObject, UITableViewDataSource {
         return indicator
     }()
 
-    init(tableView: UITableView, characters: [Character] = []) {
+    init(tableView: UITableView, viewModels: [CharacterCellViewModel] = []) {
         self.tableView = tableView
-        self.characters = characters
+        self.viewModels = viewModels
         super.init()
         self.tableView.dataSource = self
     }
 
-    func setCharacters(_ newCharacters: [Character]) {
-        characters = newCharacters
+    func setCharacters(_ newViewModels: [CharacterCellViewModel]) {
+        viewModels = newViewModels
         tableView.reloadData()
     }
 
-    func appendCharacters(_ newCharacters: [Character]) {
-        let startIndex = characters.count
-        characters.append(contentsOf: newCharacters)
-        let indexPaths = (startIndex..<characters.count).map { IndexPath(row: $0, section: 0) }
+    func appendCharacters(_ newViewModels: [CharacterCellViewModel]) {
+        let startIndex = viewModels.count
+        viewModels.append(contentsOf: newViewModels)
+        let indexPaths = (startIndex..<viewModels.count).map { IndexPath(row: $0, section: 0) }
         tableView.insertRows(at: indexPaths, with: .automatic)
     }
 
@@ -40,12 +40,12 @@ final class ListCharactersAdapter: NSObject, UITableViewDataSource {
     }
 
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        characters.count
+        viewModels.count
     }
 
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "ListCharactersTableViewCell", for: indexPath) as! ListCharactersTableViewCell
-        cell.configure(model: characters[indexPath.row])
+        cell.configure(viewModel: viewModels[indexPath.row])
         return cell
     }
 }

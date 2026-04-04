@@ -168,6 +168,29 @@ The project was received with **Marvel API** integration via `URLSession`, using
 - `imageCornerRadius` derived automatically as `imageSize / 2` — always correct regardless of device
 - `cornerRadius` applied at layout time (`addImageView()`) instead of at property declaration, ensuring the correct value is used
 
+---
+
+### WP-17 — List Screen Facelift and ViewModel Separation
+
+**Visual redesign (`ListCharactersTableViewCell`, `ListCharactersTableView`):**
+- Dark card design: card background `#0B1120`, `cornerRadius = 12`, drop shadow (opacity 0.5, radius 6)
+- Table view background `#06080F` across the table and all state containers — slightly darker than the card for depth
+- Rectangular character image: `88×88pt`, `cornerRadius = 8` — no longer circular
+- Cell layout: name label (white, headline semibold) + status row (colored 8pt dot + text) + species label (light gray)
+- Cards inset `16pt` from screen edges, `4pt` vertical padding per cell → `8pt` gap between cards
+- `separatorStyle = .none`; `backgroundColor = .clear` on cell and `contentView`
+
+**ViewModel separation (`CharacterCellViewModel`, `ListCharactersPresenter`):**
+- Introduced `CharacterCellViewModel` — `name`, `species`, `imageURL: URL?`, `statusText: String`, `statusColor: UIColor`
+- Status mapping (`switch character.status.lowercased()`) moved from the cell to `private func map(_ character: Character)` in `ListCharactersPresenter` — the single place that owns this logic
+- `ListCharactersUI` protocol updated: `update(characters:)` and `appendCharacters(_:)` now receive `[CharacterCellViewModel]` instead of `[Character]`
+- `private var displayedCharacters: [Character]` tracks the currently visible list (full or filtered by search)
+- `func character(at index: Int) -> Character?` added to `ListCharactersPresenterProtocol` — navigation decoupled from the Adapter
+- `ListCharactersAdapter` updated to hold `[CharacterCellViewModel]`; ViewController navigation uses `presenter?.character(at:)` instead of direct adapter access
+
+**Tests:**
+- 12 new presenter tests: ViewModel mapping (`Alive`→green, `dead`→red, `unknown`→gray, fallback→gray, name+species pass-through) and `character(at:)` (valid index, out-of-bounds, before load, during search, after clear search, after pagination, appended mapping)
+
 ## Technical Decisions
 ### Local filter vs. API search
 The search bar filters characters already loaded in memory instead of making a new API request on each keystroke. Since the app already paginates and accumulates all characters in `allCharacters`, querying the network again would be wasteful and would add latency with no real benefit for the user.
@@ -198,6 +221,9 @@ When an error state appears, `.screenChanged` is posted instead of `.announcemen
 
 ### Adaptive image size via computed constant
 Rather than maintaining separate size values for iPhone and iPad, `DetailCharacterViewController` exposes `Constants.imageSize` as a computed property (`300pt` on iPad, `200pt` on iPhone`) and derives `imageCornerRadius` as `imageSize / 2`. The layout code is unchanged — the device decision is fully contained in the constant.
+
+### `CharacterCellViewModel` — Presenter-owned mapping, dumb View
+Status color and text resolution (`"alive" → .systemGreen / "Alive"`) belongs to the Presenter, not the View. The View has no branch logic — it only applies values. `CharacterCellViewModel` makes the boundary explicit: the Presenter maps Domain types to UI-ready values; the cell assigns them without decisions. This also keeps `UIColor` out of the Domain layer while keeping the mapping testable at the Presenter level.
 
 ## Test Coverage
 Patterns used:

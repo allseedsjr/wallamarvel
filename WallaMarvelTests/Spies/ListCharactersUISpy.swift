@@ -3,8 +3,8 @@ import XCTest
 
 final class ListCharactersUISpy: ListCharactersUI {
     private(set) var updatedCharactersCount: Int?
-    private(set) var updatedCharacters: [Character] = []
-    private(set) var appendedCharacters: [Character] = []
+    private(set) var updatedCharacters: [CharacterCellViewModel] = []
+    private(set) var appendedCharacters: [CharacterCellViewModel] = []
     private(set) var lastShownError: AppError?
     private(set) var lastPaginationError: AppError?
     private(set) var isLoadingShown: Bool = false
@@ -29,13 +29,13 @@ final class ListCharactersUISpy: ListCharactersUI {
         hideLoadingWasCalled = true
     }
 
-    func update(characters: [Character]) {
+    func update(characters: [CharacterCellViewModel]) {
         updatedCharacters = characters
         updatedCharactersCount = characters.count
         updateExpectation?.fulfill()
     }
 
-    func appendCharacters(_ newCharacters: [Character]) {
+    func appendCharacters(_ newCharacters: [CharacterCellViewModel]) {
         appendedCharacters.append(contentsOf: newCharacters)
     }
 
