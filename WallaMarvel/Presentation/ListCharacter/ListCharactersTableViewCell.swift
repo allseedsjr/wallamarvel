@@ -27,6 +27,8 @@ final class ListCharactersTableViewCell: UITableViewCell {
     private let characterName: UILabel = {
         let label = UILabel()
         label.numberOfLines = 0
+        label.font = .adaptive(textStyle: .body)
+        label.adjustsFontForContentSizeCategory = true
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()

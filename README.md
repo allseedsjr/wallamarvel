@@ -152,6 +152,22 @@ The project was received with **Marvel API** integration via `URLSession`, using
 - Circular corner radius (`40pt` — half of the 80pt image size), consistent with the style already used on the detail screen
 - `placeholderImage` and `accessibilityHint` string literals moved to `private enum Strings`, completing the Constants/Strings enum discipline applied in WP-12
 
+---
+
+### WP-16 — iPad Adaptive Typography and Image Sizing
+
+**Font scaling (`UIFont+Adaptive.swift`):**
+- Created `UIFont.adaptive(textStyle:weight:)` — a single extension method replacing all `UIFont.systemFont(ofSize:)` and `UIFont.preferredFont(forTextStyle:)` calls across the presentation layer
+- On iPhone: uses the standard `preferredFont(forTextStyle:)` point size
+- On iPad: multiplies the base point size by `1.4` before wrapping with `UIFontMetrics` — producing noticeably larger text without hardcoding device-specific values
+- Dynamic Type (user accessibility settings) continues to work on both devices via `UIFontMetrics.scaledFont(for:)` and `adjustsFontForContentSizeCategory = true`
+- Applied to: `ListCharactersTableViewCell`, `ListCharactersTableView`, `DetailCharacterViewController`
+
+**Image sizing (`DetailCharacterViewController`):**
+- `imageSize` promoted from a fixed `CGFloat` constant to a computed value: `300pt` on iPad, `200pt` on iPhone
+- `imageCornerRadius` derived automatically as `imageSize / 2` — always correct regardless of device
+- `cornerRadius` applied at layout time (`addImageView()`) instead of at property declaration, ensuring the correct value is used
+
 ## Technical Decisions
 ### Local filter vs. API search
 The search bar filters characters already loaded in memory instead of making a new API request on each keystroke. Since the app already paginates and accumulates all characters in `allCharacters`, querying the network again would be wasteful and would add latency with no real benefit for the user.
@@ -176,6 +192,12 @@ When an error state appears, `.screenChanged` is posted instead of `.announcemen
 
 ### Accessibility labels in the View layer
 `accessibilityLabel` composition (e.g. `"Character: Morty Smith."`) is intentionally kept in the View layer. These strings are UI and platform conventions, not business rules — there is no logic to test and no reason to involve the Presenter.
+
+### `UIFont.adaptive` — single font entry point for iPhone and iPad
+`UIFont.preferredFont(forTextStyle:)` returns the same base point size on both iPhone and iPad — Dynamic Type only scales with the user's accessibility preference, not with the device class. To address this, all font assignments go through `UIFont.adaptive(textStyle:weight:)`, a thin extension that applies a `1.4×` multiplier on iPad before wrapping the result with `UIFontMetrics`. This keeps every call site uniform, avoids scattered `UIDevice` checks across multiple files, and preserves Dynamic Type on both devices.
+
+### Adaptive image size via computed constant
+Rather than maintaining separate size values for iPhone and iPad, `DetailCharacterViewController` exposes `Constants.imageSize` as a computed property (`300pt` on iPad, `200pt` on iPhone`) and derives `imageCornerRadius` as `imageSize / 2`. The layout code is unchanged — the device decision is fully contained in the constant.
 
 ## Test Coverage
 Patterns used:
