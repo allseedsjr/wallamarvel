@@ -4,6 +4,10 @@ import Kingfisher
 
 final class ListCharactersTableViewCell: UITableViewCell {
 
+    private enum Colors {
+        static let card = UIColor(red: 11/255.0, green: 17/255.0, blue: 32/255.0, alpha: 1)
+    }
+
     private enum Constants {
         static let cardCornerRadius: CGFloat = 12
         static let cardHorizontalInset: CGFloat = 16
@@ -27,7 +31,7 @@ final class ListCharactersTableViewCell: UITableViewCell {
     private let cardView: UIView = {
         let view = UIView()
         view.translatesAutoresizingMaskIntoConstraints = false
-        view.backgroundColor = UIColor(red: 11/255.0, green: 17/255.0, blue: 32/255.0, alpha: 1)
+        view.backgroundColor = Colors.card
         view.layer.cornerRadius = Constants.cardCornerRadius
         view.layer.shadowColor = UIColor.black.cgColor
         view.layer.shadowOffset = CGSize(width: 0, height: 2)

@@ -19,34 +19,32 @@ final class ListCharactersView: UIView {
         static let retry = "Retry"
         static let emptySearchTitle = "No characters found"
         static let emptySearchMessage = "Try a different name."
+        static let cellReuseIdentifier = "ListCharactersTableViewCell"
+        static let emptySearchIcon = "magnifyingglass"
+        static let retryAccessibilityHint = "Activates to reload the character list"
     }
 
-    private enum Colors {
-        static let background = UIColor(red: 6/255.0, green: 8/255.0, blue: 15/255.0, alpha: 1)
-    }
-    
     private let charactersTableView: UITableView = {
         let tableView = UITableView()
-        tableView.register(ListCharactersTableViewCell.self, forCellReuseIdentifier: "ListCharactersTableViewCell")
+        tableView.register(ListCharactersTableViewCell.self, forCellReuseIdentifier: Strings.cellReuseIdentifier)
         tableView.translatesAutoresizingMaskIntoConstraints = false
         tableView.rowHeight = UITableView.automaticDimension
         tableView.estimatedRowHeight = Constants.estimatedRowHeight
         tableView.separatorStyle = .none
-        tableView.backgroundColor = Colors.background
+        tableView.backgroundColor = .black
         return tableView
     }()
     
     private let loadingView: UIView = {
         let view = UIView()
         view.translatesAutoresizingMaskIntoConstraints = false
-        view.backgroundColor = Colors.background
+        view.backgroundColor = .black
         return view
     }()
     
     private let loadingIndicator: UIActivityIndicatorView = {
         let indicator = UIActivityIndicatorView(style: .large)
         indicator.translatesAutoresizingMaskIntoConstraints = false
-        indicator.color = .white
         indicator.startAnimating()
         return indicator
     }()
@@ -54,7 +52,7 @@ final class ListCharactersView: UIView {
     private let errorContainerView: UIView = {
         let view = UIView()
         view.translatesAutoresizingMaskIntoConstraints = false
-        view.backgroundColor = Colors.background
+        view.backgroundColor = .black
         view.isHidden = true
         return view
     }()
@@ -62,14 +60,14 @@ final class ListCharactersView: UIView {
     private let emptySearchContainerView: UIView = {
         let view = UIView()
         view.translatesAutoresizingMaskIntoConstraints = false
-        view.backgroundColor = Colors.background
+        view.backgroundColor = .black
         view.isHidden = true
         view.accessibilityElements = []
         return view
     }()
 
     private let emptySearchIconView: UIImageView = {
-        let image = UIImageView(image: UIImage(systemName: "magnifyingglass"))
+        let image = UIImageView(image: UIImage(systemName: Strings.emptySearchIcon))
         image.translatesAutoresizingMaskIntoConstraints = false
         image.tintColor = .lightGray
         image.contentMode = .scaleAspectFit
@@ -84,7 +82,7 @@ final class ListCharactersView: UIView {
         label.font = UIFont.adaptive(textStyle: .headline)
         label.adjustsFontForContentSizeCategory = true
         label.textAlignment = .center
-        label.textColor = .white
+        label.textColor = .label
         label.isAccessibilityElement = false
         return label
     }()
@@ -96,7 +94,7 @@ final class ListCharactersView: UIView {
         label.font = UIFont.adaptive(textStyle: .subheadline)
         label.adjustsFontForContentSizeCategory = true
         label.textAlignment = .center
-        label.textColor = .lightGray
+        label.textColor = .secondaryLabel
         label.numberOfLines = 0
         label.isAccessibilityElement = false
         return label
@@ -109,7 +107,7 @@ final class ListCharactersView: UIView {
         label.textAlignment = .center
         label.font = UIFont.adaptive(textStyle: .body)
         label.adjustsFontForContentSizeCategory = true
-        label.textColor = .white
+        label.textColor = .label
         return label
     }()
     
@@ -120,9 +118,8 @@ final class ListCharactersView: UIView {
         button.titleLabel?.font = UIFont.adaptive(textStyle: .headline)
         button.titleLabel?.adjustsFontForContentSizeCategory = true
         button.backgroundColor = .systemBlue
-        button.setTitleColor(.white, for: .normal)
         button.layer.cornerRadius = Constants.retryButtonCornerRadius
-        button.accessibilityHint = "Activates to reload the character list"
+        button.accessibilityHint = Strings.retryAccessibilityHint
         return button
     }()
     
@@ -136,7 +133,7 @@ final class ListCharactersView: UIView {
     }
     
     private func setup() {
-        backgroundColor = Colors.background
+        backgroundColor = .black
         addSubviews()
         addContraints()
     }

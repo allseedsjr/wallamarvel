@@ -6,82 +6,134 @@ final class DetailCharacterViewController: UIViewController {
     // MARK: - Constants
 
     private enum Constants {
-        static let stackSpacing: CGFloat = 16
-        static let contentInset: CGFloat = 16
+        static let cardCornerRadius: CGFloat = 12
+        static let cardHorizontalInset: CGFloat = 16
+        static let cardSpacing: CGFloat = 16
         static let contentVerticalInset: CGFloat = 24
-        static let imageSize: CGFloat = UIDevice.current.userInterfaceIdiom == .pad ? 300 : 200
-        static var imageCornerRadius: CGFloat { imageSize / 2 }
-        static let badgeCornerRadius: CGFloat = 10
-        static let badgeHeight: CGFloat = 28
+        static let cardPadding: CGFloat = 16
         static let rowSpacing: CGFloat = 8
+        static let innerSpacing: CGFloat = 6
+        static let statusDotSize: CGFloat = 8
         static let imageFadeDuration: CGFloat = 0.2
+        static let shadowRadius: CGFloat = 6
+        static let shadowOpacity: Float = 0.5
+        static let imageHeight: CGFloat = UIDevice.current.userInterfaceIdiom == .pad ? 320 : 220
+    }
+
+    private enum Colors {
+        static let card = UIColor(red: 11/255.0, green: 17/255.0, blue: 32/255.0, alpha: 1)
     }
 
     private enum Strings {
         static let firstSeenIn = "First seen in"
         static let retry = "Retry"
-        static let statusAlive = "● Alive"
-        static let statusDead = "● Dead"
-        static let statusUnknown = "● Unknown"
         static let rowSpecies = "Species"
         static let rowType = "Type"
         static let rowGender = "Gender"
         static let rowOrigin = "Origin"
         static let rowLocation = "Location"
         static let rowEpisodes = "Episodes"
+        static let placeholderImage = "person.crop.rectangle.fill"
     }
 
     private let character: Character
     var presenter: DetailCharacterPresenterProtocol?
 
-    // MARK: - UI
+    // MARK: - Scroll
 
     private let scrollView = UIScrollView()
-    private let contentStack: UIStackView = {
-        let stack = UIStackView()
-        stack.axis = .vertical
-        stack.spacing = Constants.stackSpacing
-        stack.layoutMargins = UIEdgeInsets(
-            top: Constants.contentVerticalInset,
-            left: Constants.contentInset,
-            bottom: Constants.contentVerticalInset,
-            right: Constants.contentInset
-        )
-        stack.isLayoutMarginsRelativeArrangement = true
-        return stack
+
+    private let scrollContent: UIView = {
+        let view = UIView()
+        view.translatesAutoresizingMaskIntoConstraints = false
+        return view
     }()
 
-    private let imageView: UIImageView = {
+    // MARK: - Card 1: Hero
+
+    private lazy var heroCard: UIView = makeCard()
+
+    private let heroImageView: UIImageView = {
         let iv = UIImageView()
+        iv.translatesAutoresizingMaskIntoConstraints = false
         iv.contentMode = .scaleAspectFill
         iv.clipsToBounds = true
-        iv.translatesAutoresizingMaskIntoConstraints = false
+        iv.tintColor = .systemGray
+        iv.backgroundColor = UIColor(white: 1, alpha: 0.05)
+        iv.layer.cornerRadius = Constants.cardCornerRadius
+        iv.layer.maskedCorners = [.layerMinXMinYCorner, .layerMaxXMinYCorner]
+        iv.isAccessibilityElement = false
         return iv
     }()
 
-    private let statusBadge: UILabel = {
+    private let nameLabel: UILabel = {
         let label = UILabel()
-        label.font = UIFont.adaptive(textStyle: .footnote, weight: .semibold)
+        label.font = .adaptive(textStyle: .title2, weight: .bold)
         label.adjustsFontForContentSizeCategory = true
         label.textColor = .white
-        label.layer.cornerRadius = Constants.badgeCornerRadius
-        label.layer.masksToBounds = true
-        label.textAlignment = .center
-        label.translatesAutoresizingMaskIntoConstraints = false
+        label.numberOfLines = 2
         return label
     }()
+
+    private let statusDot: UIView = {
+        let view = UIView()
+        view.translatesAutoresizingMaskIntoConstraints = false
+        view.layer.cornerRadius = Constants.statusDotSize / 2
+        return view
+    }()
+
+    private let statusLabel: UILabel = {
+        let label = UILabel()
+        label.font = .adaptive(textStyle: .subheadline)
+        label.adjustsFontForContentSizeCategory = true
+        label.textColor = UIColor.white.withAlphaComponent(0.75)
+        return label
+    }()
+
+    private lazy var statusRow: UIStackView = {
+        let stack = UIStackView(arrangedSubviews: [statusDot, statusLabel])
+        stack.axis = .horizontal
+        stack.spacing = Constants.innerSpacing
+        stack.alignment = .center
+        return stack
+    }()
+
+    private lazy var heroInfoStack: UIStackView = {
+        let stack = UIStackView(arrangedSubviews: [nameLabel, statusRow])
+        stack.translatesAutoresizingMaskIntoConstraints = false
+        stack.axis = .vertical
+        stack.spacing = Constants.innerSpacing
+        stack.alignment = .leading
+        return stack
+    }()
+
+    // MARK: - Card 2: Info
+
+    private lazy var infoCard: UIView = makeCard()
+
+    private let infoStack: UIStackView = {
+        let stack = UIStackView()
+        stack.translatesAutoresizingMaskIntoConstraints = false
+        stack.axis = .vertical
+        stack.spacing = Constants.rowSpacing
+        return stack
+    }()
+
+    // MARK: - Episode section (inside Card 2)
 
     private let episodeSectionLabel: UILabel = {
         let label = UILabel()
         label.text = Strings.firstSeenIn
-        label.font = .adaptive(textStyle: .headline)
+        label.font = .adaptive(textStyle: .headline, weight: .semibold)
         label.adjustsFontForContentSizeCategory = true
+        label.textColor = .white
         return label
     }()
 
     private let episodeLoadingIndicator: UIActivityIndicatorView = {
         let indicator = UIActivityIndicatorView(style: .medium)
         indicator.hidesWhenStopped = true
+        indicator.color = .white
         return indicator
     }()
 
@@ -90,6 +142,7 @@ final class DetailCharacterViewController: UIViewController {
         label.numberOfLines = 0
         label.font = .adaptive(textStyle: .subheadline)
         label.adjustsFontForContentSizeCategory = true
+        label.textColor = UIColor.white.withAlphaComponent(0.75)
         label.isHidden = true
         return label
     }()
@@ -107,6 +160,7 @@ final class DetailCharacterViewController: UIViewController {
     private lazy var retryButton: UIButton = {
         let button = UIButton(type: .system)
         button.setTitle(Strings.retry, for: .normal)
+        button.tintColor = .white
         button.addTarget(self, action: #selector(retryTapped), for: .touchUpInside)
         button.isHidden = true
         button.accessibilityHint = "Activates to retry loading the episode"
@@ -129,21 +183,21 @@ final class DetailCharacterViewController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        view.backgroundColor = .systemBackground
+        view.backgroundColor = .black
         title = character.name
-        setupLayout()
+        setupScrollView()
+        buildHeroCard()
+        buildInfoCard()
         populate()
         Task { await presenter?.loadEpisode() }
     }
 
     // MARK: - Setup
 
-    private func setupLayout() {
+    private func setupScrollView() {
         scrollView.translatesAutoresizingMaskIntoConstraints = false
-        contentStack.translatesAutoresizingMaskIntoConstraints = false
-
         view.addSubview(scrollView)
-        scrollView.addSubview(contentStack)
+        scrollView.addSubview(scrollContent)
 
         NSLayoutConstraint.activate([
             scrollView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
@@ -151,87 +205,129 @@ final class DetailCharacterViewController: UIViewController {
             scrollView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
             scrollView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
 
-            contentStack.topAnchor.constraint(equalTo: scrollView.topAnchor),
-            contentStack.leadingAnchor.constraint(equalTo: scrollView.leadingAnchor),
-            contentStack.trailingAnchor.constraint(equalTo: scrollView.trailingAnchor),
-            contentStack.bottomAnchor.constraint(equalTo: scrollView.bottomAnchor),
-            contentStack.widthAnchor.constraint(equalTo: scrollView.widthAnchor)
+            scrollContent.topAnchor.constraint(equalTo: scrollView.topAnchor),
+            scrollContent.leadingAnchor.constraint(equalTo: scrollView.leadingAnchor),
+            scrollContent.trailingAnchor.constraint(equalTo: scrollView.trailingAnchor),
+            scrollContent.bottomAnchor.constraint(equalTo: scrollView.bottomAnchor),
+            scrollContent.widthAnchor.constraint(equalTo: scrollView.widthAnchor)
         ])
     }
+
+    private func buildHeroCard() {
+        heroCard.translatesAutoresizingMaskIntoConstraints = false
+        scrollContent.addSubview(heroCard)
+        heroCard.addSubview(heroImageView)
+        heroCard.addSubview(heroInfoStack)
+
+        NSLayoutConstraint.activate([
+            heroCard.topAnchor.constraint(equalTo: scrollContent.topAnchor, constant: Constants.contentVerticalInset),
+            heroCard.leadingAnchor.constraint(equalTo: scrollContent.leadingAnchor, constant: Constants.cardHorizontalInset),
+            heroCard.trailingAnchor.constraint(equalTo: scrollContent.trailingAnchor, constant: -Constants.cardHorizontalInset),
+
+            heroImageView.topAnchor.constraint(equalTo: heroCard.topAnchor),
+            heroImageView.leadingAnchor.constraint(equalTo: heroCard.leadingAnchor),
+            heroImageView.trailingAnchor.constraint(equalTo: heroCard.trailingAnchor),
+            heroImageView.heightAnchor.constraint(equalToConstant: Constants.imageHeight),
+
+            heroInfoStack.topAnchor.constraint(equalTo: heroImageView.bottomAnchor, constant: Constants.cardPadding),
+            heroInfoStack.leadingAnchor.constraint(equalTo: heroCard.leadingAnchor, constant: Constants.cardPadding),
+            heroInfoStack.trailingAnchor.constraint(equalTo: heroCard.trailingAnchor, constant: -Constants.cardPadding),
+            heroInfoStack.bottomAnchor.constraint(equalTo: heroCard.bottomAnchor, constant: -Constants.cardPadding),
+
+            statusDot.widthAnchor.constraint(equalToConstant: Constants.statusDotSize),
+            statusDot.heightAnchor.constraint(equalToConstant: Constants.statusDotSize)
+        ])
+    }
+
+    private func buildInfoCard() {
+        infoCard.translatesAutoresizingMaskIntoConstraints = false
+        scrollContent.addSubview(infoCard)
+        infoCard.addSubview(infoStack)
+
+        NSLayoutConstraint.activate([
+            infoCard.topAnchor.constraint(equalTo: heroCard.bottomAnchor, constant: Constants.cardSpacing),
+            infoCard.leadingAnchor.constraint(equalTo: scrollContent.leadingAnchor, constant: Constants.cardHorizontalInset),
+            infoCard.trailingAnchor.constraint(equalTo: scrollContent.trailingAnchor, constant: -Constants.cardHorizontalInset),
+            infoCard.bottomAnchor.constraint(equalTo: scrollContent.bottomAnchor, constant: -Constants.contentVerticalInset),
+
+            infoStack.topAnchor.constraint(equalTo: infoCard.topAnchor, constant: Constants.cardPadding),
+            infoStack.leadingAnchor.constraint(equalTo: infoCard.leadingAnchor, constant: Constants.cardPadding),
+            infoStack.trailingAnchor.constraint(equalTo: infoCard.trailingAnchor, constant: -Constants.cardPadding),
+            infoStack.bottomAnchor.constraint(equalTo: infoCard.bottomAnchor, constant: -Constants.cardPadding)
+        ])
+    }
+
+    // MARK: - Populate
 
     private func populate() {
-        addImageView()
-        addStatusBadge()
-        addInfoRows()
-        addEpisodeSection()
+        populateHeroCard()
+        populateInfoCard()
     }
 
-    private func addImageView() {
-        let container = UIView()
-        container.addSubview(imageView)
-        NSLayoutConstraint.activate([
-            imageView.centerXAnchor.constraint(equalTo: container.centerXAnchor),
-            imageView.topAnchor.constraint(equalTo: container.topAnchor),
-            imageView.bottomAnchor.constraint(equalTo: container.bottomAnchor),
-            imageView.widthAnchor.constraint(equalToConstant: Constants.imageSize),
-            imageView.heightAnchor.constraint(equalToConstant: Constants.imageSize)
-        ])
-        imageView.layer.cornerRadius = Constants.imageCornerRadius
-        contentStack.addArrangedSubview(container)
-
-        imageView.isAccessibilityElement = false
-        container.isAccessibilityElement = false
-
+    private func populateHeroCard() {
         if let url = URL(string: character.imageURL) {
-            imageView.kf.setImage(with: url, options: [.transition(.fade(Constants.imageFadeDuration)), .cacheOriginalImage])
+            let placeholder = UIImage(systemName: Strings.placeholderImage)
+            heroImageView.kf.setImage(
+                with: url,
+                placeholder: placeholder,
+                options: [.transition(.fade(Constants.imageFadeDuration)), .cacheOriginalImage]
+            )
         }
-    }
 
-    private func addStatusBadge() {
-        let status = character.status.lowercased()
-        let (text, color, accessibleStatus): (String, UIColor, String) = {
-            switch status {
-            case "alive": return (Strings.statusAlive, .systemGreen, "Alive")
-            case "dead":  return (Strings.statusDead, .systemRed, "Dead")
-            default:      return (Strings.statusUnknown, .systemGray, "Unknown")
+        nameLabel.text = character.name
+        nameLabel.isAccessibilityElement = true
+        nameLabel.accessibilityLabel = "Character: \(character.name)"
+        heroImageView.isAccessibilityElement = false
+
+        let (statusText, statusColor, accessibleStatus): (String, UIColor, String) = {
+            switch character.status.lowercased() {
+            case "alive": return ("Alive", .systemGreen, "Alive")
+            case "dead":  return ("Dead", .systemRed, "Dead")
+            default:      return ("Unknown", .systemGray, "Unknown")
             }
         }()
-        statusBadge.text = "  \(text)  "
-        statusBadge.backgroundColor = color
-        statusBadge.isAccessibilityElement = true
-        statusBadge.accessibilityLabel = "Status: \(accessibleStatus)"
-
-        let container = UIView()
-        container.addSubview(statusBadge)
-        NSLayoutConstraint.activate([
-            statusBadge.centerXAnchor.constraint(equalTo: container.centerXAnchor),
-            statusBadge.topAnchor.constraint(equalTo: container.topAnchor),
-            statusBadge.bottomAnchor.constraint(equalTo: container.bottomAnchor),
-            statusBadge.heightAnchor.constraint(equalToConstant: Constants.badgeHeight)
-        ])
-        contentStack.addArrangedSubview(container)
+        statusDot.backgroundColor = statusColor
+        statusLabel.text = statusText
+        statusLabel.isAccessibilityElement = true
+        statusLabel.accessibilityLabel = "Status: \(accessibleStatus)"
     }
 
-    private func addInfoRows() {
-        contentStack.addArrangedSubview(makeInfoRow(title: Strings.rowSpecies, value: character.species))
+    private func populateInfoCard() {
+        addInfoRow(title: Strings.rowSpecies, value: character.species)
         if !character.type.isEmpty {
-            contentStack.addArrangedSubview(makeInfoRow(title: Strings.rowType, value: character.type))
+            addInfoRow(title: Strings.rowType, value: character.type)
         }
-        contentStack.addArrangedSubview(makeInfoRow(title: Strings.rowGender, value: character.gender))
-        contentStack.addArrangedSubview(makeInfoRow(title: Strings.rowOrigin, value: character.originName))
-        contentStack.addArrangedSubview(makeInfoRow(title: Strings.rowLocation, value: character.locationName))
-        contentStack.addArrangedSubview(makeInfoRow(title: Strings.rowEpisodes, value: "\(character.episodeCount)"))
+        addInfoRow(title: Strings.rowGender, value: character.gender)
+        addInfoRow(title: Strings.rowOrigin, value: character.originName)
+        addInfoRow(title: Strings.rowLocation, value: character.locationName)
+        addInfoRow(title: Strings.rowEpisodes, value: "\(character.episodeCount)")
+
+        let separator = makeSeparator()
+        infoStack.addArrangedSubview(separator)
+        infoStack.setCustomSpacing(Constants.cardPadding, after: separator)
+
+        infoStack.addArrangedSubview(episodeSectionLabel)
+        infoStack.setCustomSpacing(Constants.innerSpacing, after: episodeSectionLabel)
+        infoStack.addArrangedSubview(episodeLoadingIndicator)
+        infoStack.addArrangedSubview(episodeInfoLabel)
+        infoStack.addArrangedSubview(episodeErrorLabel)
+        infoStack.addArrangedSubview(retryButton)
     }
 
-    private func addEpisodeSection() {
-        contentStack.addArrangedSubview(episodeSectionLabel)
-        contentStack.addArrangedSubview(episodeLoadingIndicator)
-        contentStack.addArrangedSubview(episodeInfoLabel)
-        contentStack.addArrangedSubview(episodeErrorLabel)
-        contentStack.addArrangedSubview(retryButton)
+    // MARK: - Helpers
+
+    private func makeCard() -> UIView {
+        let view = UIView()
+        view.backgroundColor = Colors.card
+        view.layer.cornerRadius = Constants.cardCornerRadius
+        view.layer.shadowColor = UIColor.black.cgColor
+        view.layer.shadowOffset = CGSize(width: 0, height: 2)
+        view.layer.shadowRadius = Constants.shadowRadius
+        view.layer.shadowOpacity = Constants.shadowOpacity
+        return view
     }
 
-    private func makeInfoRow(title: String, value: String) -> UIView {
+    private func addInfoRow(title: String, value: String) {
         let row = UIStackView()
         row.axis = .horizontal
         row.spacing = Constants.rowSpacing
@@ -243,6 +339,7 @@ final class DetailCharacterViewController: UIViewController {
         titleLabel.text = title
         titleLabel.font = UIFont.adaptive(textStyle: .subheadline, weight: .semibold)
         titleLabel.adjustsFontForContentSizeCategory = true
+        titleLabel.textColor = UIColor.white.withAlphaComponent(0.75)
         titleLabel.setContentHuggingPriority(.defaultHigh, for: .horizontal)
         titleLabel.isAccessibilityElement = false
 
@@ -250,13 +347,22 @@ final class DetailCharacterViewController: UIViewController {
         valueLabel.text = value
         valueLabel.font = .adaptive(textStyle: .subheadline)
         valueLabel.adjustsFontForContentSizeCategory = true
+        valueLabel.textColor = .white
         valueLabel.textAlignment = .right
         valueLabel.numberOfLines = 0
         valueLabel.isAccessibilityElement = false
 
         row.addArrangedSubview(titleLabel)
         row.addArrangedSubview(valueLabel)
-        return row
+        infoStack.addArrangedSubview(row)
+    }
+
+    private func makeSeparator() -> UIView {
+        let separator = UIView()
+        separator.translatesAutoresizingMaskIntoConstraints = false
+        separator.backgroundColor = UIColor.white.withAlphaComponent(0.1)
+        separator.heightAnchor.constraint(equalToConstant: 1).isActive = true
+        return separator
     }
 
     // MARK: - Actions
