@@ -191,6 +191,28 @@ The project was received with **Marvel API** integration via `URLSession`, using
 **Tests:**
 - 12 new presenter tests: ViewModel mapping (`Alive`→green, `dead`→red, `unknown`→gray, fallback→gray, name+species pass-through) and `character(at:)` (valid index, out-of-bounds, before load, during search, after clear search, after pagination, appended mapping)
 
+---
+
+### WP-18 — Detail Screen Facelift
+
+**Two-card layout (`DetailCharacterViewController`):**
+- Background `#06080F` — consistent with the list screen
+- Navigation bar styled dark: `UINavigationBarAppearance` with `#06080F` background, white title and back chevron
+
+**Card 1 — Hero card:**
+- Full-width image at the top (`scaleAspectFill`, height `220pt` iPhone / `320pt` iPad), rounded only on top corners (`maskedCorners = [topLeft, topRight]`, `cornerRadius = 12`, `clipsToBounds = true`)
+- Below the image (inside the same card): `name` label (white, `title2` bold) and status row (8pt colored dot + status text at 75% alpha) with `16pt` padding
+- Card background `#0B1120`, `cornerRadius = 12`, drop shadow (opacity 0.5, radius 6)
+
+**Card 2 — Info card:**
+- Same dark card style (`#0B1120`, `cornerRadius = 12`, shadow)
+- Info rows: Species, Type (shown only when non-empty), Gender, Origin, Location, Episodes — title at 75% alpha white, value at full white, `equalSpacing` distribution
+- `1pt` white-10%-alpha separator divides rows from the episode section
+- Episode section: "First seen in" label → loading indicator / episode text / error + retry button; loading indicator and retry button tinted white
+
+**Spacing:**
+- Cards inset `16pt` from horizontal edges, `16pt` gap between cards, `24pt` vertical padding at top and bottom of scroll area — matches list screen edge rhythm
+
 ## Technical Decisions
 ### Local filter vs. API search
 The search bar filters characters already loaded in memory instead of making a new API request on each keystroke. Since the app already paginates and accumulates all characters in `allCharacters`, querying the network again would be wasteful and would add latency with no real benefit for the user.
@@ -219,8 +241,8 @@ When an error state appears, `.screenChanged` is posted instead of `.announcemen
 ### `UIFont.adaptive` — single font entry point for iPhone and iPad
 `UIFont.preferredFont(forTextStyle:)` returns the same base point size on both iPhone and iPad — Dynamic Type only scales with the user's accessibility preference, not with the device class. To address this, all font assignments go through `UIFont.adaptive(textStyle:weight:)`, a thin extension that applies a `1.4×` multiplier on iPad before wrapping the result with `UIFontMetrics`. This keeps every call site uniform, avoids scattered `UIDevice` checks across multiple files, and preserves Dynamic Type on both devices.
 
-### Adaptive image size via computed constant
-Rather than maintaining separate size values for iPhone and iPad, `DetailCharacterViewController` exposes `Constants.imageSize` as a computed property (`300pt` on iPad, `200pt` on iPhone`) and derives `imageCornerRadius` as `imageSize / 2`. The layout code is unchanged — the device decision is fully contained in the constant.
+### Adaptive image height via inline constant
+The detail screen hero image height is defined as a single `Constants.imageHeight` value — `220pt` on iPhone, `320pt` on iPad. This replaces the previous circular image approach (where size and cornerRadius had to stay in sync). Now the image fills the card width and only its height varies by device, keeping the layout code unchanged and the device decision isolated to one constant.
 
 ### `CharacterCellViewModel` — Presenter-owned mapping, dumb View
 Status color and text resolution (`"alive" → .systemGreen / "Alive"`) belongs to the Presenter, not the View. The View has no branch logic — it only applies values. `CharacterCellViewModel` makes the boundary explicit: the Presenter maps Domain types to UI-ready values; the cell assigns them without decisions. This also keeps `UIColor` out of the Domain layer while keeping the mapping testable at the Presenter level.
